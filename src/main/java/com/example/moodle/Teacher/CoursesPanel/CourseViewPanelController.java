@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static com.example.moodle.DBConnection.*;
+import static com.example.moodle.moodleclient.Moodleclient.currentCourse;
 import static com.example.moodle.moodleclient.Moodleclient.root;
 
 public class CourseViewPanelController implements Initializable {
@@ -83,19 +85,17 @@ public class CourseViewPanelController implements Initializable {
     @FXML
     private Text chaptersTitle;
 
-    public Course course;
-
     public static List<ChapterCard> Chapterslist;
 
     private Connection connect() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/moodleclient";
-        String user = "root";
-        String password = "root";
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        coursename.setText(currentCourse.getCourseName());
+        courseDescription.setText(currentCourse.getCourseDescription());
+
         Chapterslist = new ArrayList<>();
         ChaptersVbox.getChildren().clear();
         hideAll();
@@ -117,6 +117,7 @@ public class CourseViewPanelController implements Initializable {
         newChapBtn.setVisible(true);
         newChapBtn.setDisable(false);
         ChaptersVbox.getChildren().clear();
+        Chapterslist.clear();
 
         loadChaptersFromDatabase();
 
@@ -126,6 +127,14 @@ public class CourseViewPanelController implements Initializable {
     void handleCourseFilesBtn(ActionEvent event) {
         ChaptersVbox.setVisible(false);
         selectBtn(leftbtnMenu, CourseFilesBtn);
+        ChaptersVbox.getChildren().clear();
+
+    }
+
+    @FXML
+    void handleParticipantsBtn(ActionEvent event) {
+        ChaptersVbox.setVisible(false);
+        selectBtn(leftbtnMenu, ParticipantsBtn);
         ChaptersVbox.getChildren().clear();
 
     }
@@ -141,9 +150,6 @@ public class CourseViewPanelController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/EditCourseDialog.fxml"));
             Parent root = loader.load();
 
-            EditCourseDialogController editcontroller = loader.getController();
-            editcontroller.setCourse(getCourse());
-
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initStyle(StageStyle.TRANSPARENT);
@@ -152,14 +158,6 @@ public class CourseViewPanelController implements Initializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-    }
-
-    @FXML
-    void handleParticipantsBtn(ActionEvent event) {
-        ChaptersVbox.setVisible(false);
-        selectBtn(leftbtnMenu, ParticipantsBtn);
-        ChaptersVbox.getChildren().clear();
 
     }
 
@@ -179,9 +177,6 @@ public class CourseViewPanelController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/CreateChapterDialog.fxml"));
             Parent root = loader.load();
-
-            CreateChapterDialogController ccdc = loader.getController();
-            ccdc.course = getCourse();
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -205,31 +200,8 @@ public class CourseViewPanelController implements Initializable {
         }
     }
 
-    public Course getCourse(){
-        String query = "SELECT * FROM Course WHERE courseName = '" + coursename.getText() +"'";
-
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-
-                course = new Course(
-                        rs.getInt("id"),
-                        rs.getString("courseName"),
-                        rs.getString("courseAbr"),
-                        rs.getString("courseDescription"),
-                        rs.getInt("nbChapters"),
-                        rs.getInt("nbAssignments")
-                );
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return course;
-    }
-
     public void loadChaptersFromDatabase() {
-        String query = "SELECT * FROM chapters WHERE courseId = '" + course.getId() + "'";
+        String query = "SELECT * FROM chapters WHERE courseId = '" + currentCourse.getId() + "'";
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(query);
              ResultSet rs = pstmt.executeQuery()) {

@@ -51,7 +51,7 @@ public class CreateCourseDialogController implements Initializable {
             CourseDAO.insertCourse(namefield.getText(), shortnamefield.getText(), descriptionfield.getText(), nbChapters, nbAssignments);
             System.out.println("Course created successfully.");
 
-            FXMLLoader coursesloader = new FXMLLoader(CreateCourseDialogController.class.getResource("/com/example/moodle/FXML/CoursesPanel_updated.fxml"));
+            FXMLLoader coursesloader = new FXMLLoader(CreateCourseDialogController.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
             AnchorPane courses = coursesloader.load();
 
             CoursesPanelController CourseCtrler = coursesloader.getController();

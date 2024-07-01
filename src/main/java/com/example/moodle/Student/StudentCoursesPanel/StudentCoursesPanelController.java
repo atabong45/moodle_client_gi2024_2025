@@ -14,9 +14,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 
 public class StudentCoursesPanelController implements Initializable{
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/moodleclient";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
+
 
     @FXML
     private Label returnArrow;

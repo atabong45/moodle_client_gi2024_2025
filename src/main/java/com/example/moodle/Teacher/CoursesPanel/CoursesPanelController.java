@@ -26,6 +26,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import static com.example.moodle.DBConnection.*;
+
 public class CoursesPanelController implements Initializable {
 
     @FXML
@@ -96,11 +98,8 @@ public class CoursesPanelController implements Initializable {
     }
 
     private Connection connect() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/moodleclient";
-        String user = "root";
-        String password = "";
 
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
     }
 
     private boolean isCourseInDatabase(String courseName) {

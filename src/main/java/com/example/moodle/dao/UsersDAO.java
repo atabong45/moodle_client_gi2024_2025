@@ -1,15 +1,15 @@
 package com.example.moodle.dao;
 
-import com.example.moodle.Entities.User;
+import com.example.moodle.Student.Entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 
+import static com.example.moodle.DBConnection.*;
+
 public class UsersDAO {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/moodleclient";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+
 
     public static void main(String[] args) {
         try {
@@ -42,7 +42,7 @@ public class UsersDAO {
     // Méthode pour insérer un enseignant
     public static void insertUser(User user) {
         String query = "INSERT INTO user (userid, username, password, token, picture, role) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, user.getUserid());
             statement.setString(2, user.getUsername());
@@ -60,7 +60,7 @@ public class UsersDAO {
     // Méthode pour lire tous les enseignants
     public static void readUsers() {
         String query = "SELECT * FROM Users";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -82,7 +82,7 @@ public class UsersDAO {
     public static User findUser(String name) {
         User user = null;
         String query = "SELECT * FROM user WHERE username = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
             PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setString(1, name);
                 ResultSet resultSet = statement.executeQuery();
@@ -105,7 +105,7 @@ public class UsersDAO {
     public static ArrayList<User> getUsers() {
         ArrayList<User> users = new ArrayList<>();
         String query = "SELECT * FROM user";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -128,7 +128,7 @@ public class UsersDAO {
     // Méthode pour mettre à jour un enseignant, qu'on ne va pas utiliser ici
     public static void updateUsers(int id, String name, String surname, String username, String password, String email, String statut) {
         String query = "UPDATE Users SET name = ?, surname = ?, username = ?, password = ?, email = ?, statut = ? WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, name);
             statement.setString(2, surname);
@@ -147,7 +147,7 @@ public class UsersDAO {
     // Méthode pour supprimer un enseignant
     public static void deleteUser(int id) {
         String query = "DELETE FROM user WHERE userid = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             statement.executeUpdate();

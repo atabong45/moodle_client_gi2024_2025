@@ -1,15 +1,15 @@
 package com.example.moodle.dao;
 
-import com.example.moodle.Entities.Course;
+import com.example.moodle.Student.Entities.Course;
 
 import java.sql.*;
 import java.util.ArrayList;
 
+import static com.example.moodle.DBConnection.*;
+
 public class CourseDAO {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/moodleclient";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "";
+
 
     public static void main(String[] args) {
         try {
@@ -42,7 +42,7 @@ public class CourseDAO {
     // Méthode pour insérer un cours
     public static void insertCourse(Course course) {
         String query = "INSERT INTO course (courseid, fullname, shortname, summary, numsections, startdate, enddate, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, course.getCourseid());
             statement.setString(2, course.getFullname());
@@ -62,7 +62,7 @@ public class CourseDAO {
     public static boolean isCourse(long id) {
         Course course = null;
         String query = "SELECT * FROM course WHERE courseid = ?";
-        try(Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try(Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -78,7 +78,7 @@ public class CourseDAO {
     public static ArrayList<Course> getEnrolledCourses(long id) {
         ArrayList<Course> courses = new ArrayList<>();
         String query = "SELECT * FROM course WHERE studentid = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query);
              ) {
             statement.setLong(1, id);
@@ -105,7 +105,7 @@ public class CourseDAO {
     // Méthode pour lire tous les cours
     public static void readCourses() {
         String query = "SELECT * FROM Course";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -126,7 +126,7 @@ public class CourseDAO {
     // Méthode pour mettre à jour un cours
     public static void updateCourse(int id, String courseName, String courseAbr, String courseDescription, int nbChapters, int nbAssignments) {
         String query = "UPDATE Course SET courseName = ?, courseAbr = ?, courseDescription = ?, nbChapters = ?, nbAssignments = ? WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, courseName);
             statement.setString(2, courseAbr);
@@ -144,7 +144,7 @@ public class CourseDAO {
     // Méthode pour supprimer un cours
     public static void deleteCourse(int id) {
         String query = "DELETE FROM Course WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             statement.executeUpdate();
