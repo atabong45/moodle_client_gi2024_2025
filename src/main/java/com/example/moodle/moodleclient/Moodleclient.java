@@ -1,6 +1,6 @@
 package com.example.moodle.moodleclient;
 
-import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.Entities.Course;
 import javafx.scene.layout.BorderPane;
 
 public class Moodleclient {

@@ -1,11 +1,12 @@
 package com.example.moodle.dao;
 
-import com.example.moodle.Student.Entities.Course;
+import com.example.moodle.Entities.Course;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 import static com.example.moodle.DBConnection.*;
+import static com.example.moodle.moodleclient.Moodleclient.user;
 
 public class CourseDAO {
 
@@ -41,7 +42,7 @@ public class CourseDAO {
 
     // Méthode pour insérer un cours
     public static void insertCourse(Course course) {
-        String query = "INSERT INTO course (courseid, fullname, shortname, summary, numsections, startdate, enddate, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO course (courseid, fullname, shortname, summary, numsections, startdate, enddate, updated, studentid, teacherid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, course.getCourseid());
@@ -51,7 +52,9 @@ public class CourseDAO {
             statement.setInt(5, course.getNumsections());
             statement.setLong(6, course.getStartdate());
             statement.setLong(7, course.getEnddate());
-            statement.setLong(6, course.getUpdated());
+            statement.setLong(8, course.getUpdated());
+            statement.setLong(9, user.getId());
+            statement.setLong(10, 2);
             statement.executeUpdate();
             System.out.println("Course inserted successfully.");
         } catch (SQLException e) {
@@ -82,10 +85,10 @@ public class CourseDAO {
              PreparedStatement statement = connection.prepareStatement(query);
              ) {
             statement.setLong(1, id);
-            ResultSet resultSet = statement.executeQuery(query);
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Course course = new Course();
-                course.setCourseid(resultSet.getLong("id"));
+                course.setCourseid(resultSet.getLong("courseid"));
                 course.setFullname(resultSet.getString("fullname"));
                 course.setShortname(resultSet.getString("shortname"));
                 course.setSummary(resultSet.getString("summary"));

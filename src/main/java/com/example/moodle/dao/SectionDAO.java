@@ -32,12 +32,12 @@ public class SectionDAO {
         }
     }
 
-    public static ArrayList<Section> getSections (int courseId) {
+    public static ArrayList<Section> getSections (long courseId) {
         ArrayList<Section> sections = new ArrayList<>();
         String query = "SELECT * FROM section WHERE courseid = ?";
         try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
             PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, courseId);
+            statement.setLong(1, courseId);
             ResultSet resultSet = statement.executeQuery();
             while(resultSet.next()) {
                 long id = resultSet.getInt("sectionid");

@@ -2,16 +2,13 @@ package com.example.moodle.Teacher.CoursesPanel;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import com.example.moodle.Entities.Course;
 import com.example.moodle.Teacher.Cards.CourseCard;
-import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.api.CourseHelper;
+import com.example.moodle.dao.CourseDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -27,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import static com.example.moodle.DBConnection.*;
+import static com.example.moodle.moodleclient.Moodleclient.user;
 
 public class CoursesPanelController implements Initializable {
 
@@ -69,18 +67,7 @@ public class CoursesPanelController implements Initializable {
         }
     }
 
-    private void addCourseToDatabase(String courseName) {
-        String query = "INSERT INTO course (fullname) VALUES (?)";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, courseName);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
     public void addCourseCard(CourseCard courseCard) {
-
         list.add(courseCard);
         gridpane.getChildren().clear();
 
@@ -97,47 +84,17 @@ public class CoursesPanelController implements Initializable {
         }
     }
 
-    private Connection connect() throws SQLException {
-
-        return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
-    }
-
-    private boolean isCourseInDatabase(String courseName) {
-        String query = "SELECT COUNT(*) FROM course WHERE fullname = ?";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, courseName);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                return rs.getInt(1) > 0;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     private void loadCoursesFromDatabase() {
-        String query = "SELECT fullname FROM course";
-
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                Course course = new Course(
-                        rs.getInt("id"),
-                        rs.getString("courseName"),
-                        rs.getString("courseAbr"),
-                        rs.getString("courseDescription"),
-                        rs.getInt("nbChapters"),
-                        rs.getInt("nbAssignments")
-                );
-
-                addCourseCard(new CourseCard(course));
-
+        ArrayList<com.example.moodle.Entities.Course> courses = CourseDAO.getEnrolledCourses(user.getId());
+        if(courses.size() == 0) {
+            CourseHelper courseHelper = new CourseHelper();
+            courses = courseHelper.getEnrolledCourses(user.getId());
+            for(Course course: courses) {
+                CourseDAO.insertCourse(course);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        for (com.example.moodle.Entities.Course course: courses) {
+            addCourseCard(new CourseCard(course));
         }
     }
 

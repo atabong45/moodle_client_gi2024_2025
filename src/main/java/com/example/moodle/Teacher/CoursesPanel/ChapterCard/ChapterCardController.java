@@ -1,11 +1,17 @@
 package com.example.moodle.Teacher.CoursesPanel.ChapterCard;
 
+import com.example.moodle.Entities.Module;
+import com.example.moodle.Entities.Section;
 import com.example.moodle.Teacher.CoursesPanel.CourseViewPanelController;
 import com.example.moodle.Teacher.CoursesPanel.DialogWindows.CreateChapterDialogController;
 import com.example.moodle.Teacher.entity.Chapter;
 import com.example.moodle.Teacher.entity.DocumentFile;
+import com.example.moodle.api.FileHelper;
+import com.example.moodle.api.ModuleHelper;
 import com.example.moodle.dao.CourseDAO;
 import com.example.moodle.dao.DocumentsFilesDAO;
+import com.example.moodle.dao.FileDAO;
+import com.example.moodle.dao.ModuleDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +34,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -50,7 +57,7 @@ public class ChapterCardController implements Initializable {
     @FXML
     private Label chapterNum;
 
-    public Chapter chapter;
+    public Section section;
 
     private int NumFiles;
 
@@ -90,7 +97,7 @@ public class ChapterCardController implements Initializable {
                 String filePath = file.getAbsolutePath();
 
                 // Insert the file into the database
-                DocumentsFilesDAO.insertDocumentFile(fileName, fileSize, fileType, filePath, chapter.getId());
+                DocumentsFilesDAO.insertDocumentFile(fileName, fileSize, fileType, filePath, (int)section.getCourseid());
 
                 NumFiles++;
                 FilesVbox.getChildren().add(docLine(fileName, readableFileSize, fileType, filePath));
@@ -104,7 +111,7 @@ public class ChapterCardController implements Initializable {
 
         try (Connection conn = connect();
              PreparedStatement statement = conn.prepareStatement("DELETE FROM documents_files WHERE chapterId = ?")) {
-            statement.setInt(1, chapter.getId());
+            statement.setLong(1, section.getCourseid());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -112,7 +119,7 @@ public class ChapterCardController implements Initializable {
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement("DELETE FROM chapters WHERE id = ?")) {
-            pstmt.setInt(1, chapter.getId());
+            pstmt.setLong(1, section.getCourseid());
             pstmt.executeUpdate();
             System.out.println("Chapter deleted successfully.");
 
@@ -120,37 +127,69 @@ public class ChapterCardController implements Initializable {
             e.printStackTrace();
         }
 
-        currentCourse.setNbChapters(currentCourse.getNbChapters() - 1);
-        CourseDAO.updateCourse(currentCourse.getId(), currentCourse.getCourseName(), currentCourse.getCourseAbr(), currentCourse.getCourseDescription(), currentCourse.getNbChapters(), currentCourse.getNbAssignments());
+        currentCourse.setNumsections(currentCourse.getNumsections() - 1);
+        CourseDAO.updateCourse((int) currentCourse.getCourseid(), currentCourse.getFullname(), currentCourse.getShortname(), currentCourse.getSummary(), currentCourse.getNumsections(), currentCourse.getNumsections());
 
     }
 
 
     private void loadDocumentsFilesFromDatabase() {
+        ArrayList<com.example.moodle.Entities.File> files = new ArrayList<>();
+        ArrayList<Module> modules = ModuleDAO.getModules(section.getSectionid());
+        if(modules.size() == 0) {
+            ModuleHelper moduleHelper = new ModuleHelper();
+            modules = moduleHelper.getModules(currentCourse.getCourseid(), section.getSectionid());
+            if(modules.size() != 0) {
+                for (Module module: modules) {
+                    ModuleDAO.insertModule(module);
+                }
+            }
+        }
+
         NumFiles = 0;
         FilesVbox.getChildren().clear();
 
-        String query = "SELECT * FROM documents_files WHERE chapterId = '" + chapter.getId() + "'";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-                DocumentFile doc = new DocumentFile(
-                    rs.getInt("id"),
-                    rs.getString("fileName"),
-                    rs.getLong("fileSize"),
-                    rs.getString("fileType"),
-                    rs.getString("filePath"),
-                    rs.getInt("chapterId")
-                );
+        for (Module module: modules) {
+            if (module.getModplural().equals("Files")) {
+                com.example.moodle.Entities.File file = FileDAO.getFile(module.getCmid());
+                if(file == null) {
+                    FileHelper fileHelper = new FileHelper();
+                    file = fileHelper.getFile(currentCourse.getCourseid(), section.getSectionid(), module.getCmid());
+                    if(file != null) {
+                        FileDAO.insertFile(file);
+                    }
+                }
+                if(file != null) {
+                    NumFiles++;
+                    FilesNumber.setText(NumFiles+"");
+                    FilesVbox.getChildren().add(docLine(file.getFilename(), readableFileSize(file.getFilesize()), "PDF", file.getFilepath()));
+                }
 
-                NumFiles++;
-                FilesNumber.setText(NumFiles+"");
-                FilesVbox.getChildren().add(docLine(doc.getFileName(), readableFileSize(doc.getFileSize()), doc.getFileType(), doc.getFilePath()));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+
+
+//        String query = "SELECT * FROM documents_files WHERE chapterId = '" + section.getCourseid() + "'";
+//        try (Connection conn = connect();
+//             PreparedStatement pstmt = conn.prepareStatement(query);
+//             ResultSet rs = pstmt.executeQuery()) {
+//            while (rs.next()) {
+//                DocumentFile doc = new DocumentFile(
+//                    rs.getInt("id"),
+//                    rs.getString("fileName"),
+//                    rs.getLong("fileSize"),
+//                    rs.getString("fileType"),
+//                    rs.getString("filePath"),
+//                    rs.getInt("chapterId")
+//                );
+//
+//                NumFiles++;
+//                FilesNumber.setText(NumFiles+"");
+//                FilesVbox.getChildren().add(docLine(doc.getFileName(), readableFileSize(doc.getFileSize()), doc.getFileType(), doc.getFilePath()));
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
 
     private String getFileType(File file) {
@@ -175,13 +214,13 @@ public class ChapterCardController implements Initializable {
         return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
-    public void define(String name, String num, int nbfichiers, Chapter chap) {
+    public void define(String name, String num, int nbfichiers, Section section) {
         this.chapterName.setText(name);
         this.chapterNum.setText(num);
         this.chapterNum.setStyle("-fx-text-fill: black");
         this.FilesNumber.setText(nbfichiers+"");
         this.FilesNumber.setStyle("-fx-text-fill: black");
-        this.chapter = chap;
+        this.section = section;
 
         loadDocumentsFilesFromDatabase();
     }

@@ -1,7 +1,7 @@
 package com.example.moodle.Teacher.CoursesPanel.DialogWindows;
 
 import com.example.moodle.Teacher.Cards.CourseCard;
-import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.Entities.Course;
 import com.example.moodle.Teacher.CoursesPanel.CoursesPanelController;
 import com.example.moodle.dao.CourseDAO;
 import javafx.event.ActionEvent;
@@ -36,57 +36,59 @@ public class CreateCourseDialogController implements Initializable {
 
     }
 
-    @FXML
-    void createCourse(ActionEvent event) {
-
-        int nbChapters = 0;
-        int nbAssignments = 0;
-
-        if (namefield.getText().isEmpty() || shortnamefield.getText().isEmpty() || descriptionfield.getText().isEmpty()) {
-            System.out.println("All fields must be filled out!");
-            return;
-        }
-
-        try {
-            CourseDAO.insertCourse(namefield.getText(), shortnamefield.getText(), descriptionfield.getText(), nbChapters, nbAssignments);
-            System.out.println("Course created successfully.");
-
-            FXMLLoader coursesloader = new FXMLLoader(CreateCourseDialogController.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
-            AnchorPane courses = coursesloader.load();
-
-            CoursesPanelController CourseCtrler = coursesloader.getController();
-            CourseCtrler.addCourseCard(new CourseCard(new Course(
-                    CourseCtrler.getCoursesCount(),
-                    namefield.getText(),
-                    shortnamefield.getText(),
-                    descriptionfield.getText(),
-                    nbChapters,
-                    nbAssignments
-            )));
-
-            root.setCenter(courses);
-
-//            CourseDAO.insertCourse(courseName, courseAbr, courseDescription, nbChapters, nbAssignments);
+//    @FXML
+//    void createCourse(ActionEvent event) {
+//
+//        int nbChapters = 0;
+//        int nbAssignments = 0;
+//
+//        if (namefield.getText().isEmpty() || shortnamefield.getText().isEmpty() || descriptionfield.getText().isEmpty()) {
+//            System.out.println("All fields must be filled out!");
+//            return;
+//        }
+//
+//        try {
+//            CourseDAO.insertCourse(namefield.getText(), shortnamefield.getText(), descriptionfield.getText(), nbChapters, nbAssignments);
 //            System.out.println("Course created successfully.");
 //
-//            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/AvailableCourseCard_updated.fxml"));
-//            Pane courseCard = loader.load();
+//            FXMLLoader coursesloader = new FXMLLoader(CreateCourseDialogController.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
+//            AnchorPane courses = coursesloader.load();
 //
-//            AvailableCourseCardController controller = loader.getController();
-//            controller.setCourseDetails(courseName, courseDescription, nbChapters);
+//            CoursesPanelController CourseCtrler = coursesloader.getController();
+//            Course course = new Course();
+//            course.ge
+//            CourseCtrler.addCourseCard(new CourseCard(new Course(
+//                    CourseCtrler.getCoursesCount(),
+//                    namefield.getText(),
+//                    shortnamefield.getText(),
+//                    descriptionfield.getText(),
+//                    nbChapters,
+//                    nbAssignments
+//            )));
 //
-//            if (coursesPanelController != null) {
-//                coursesPanelController.addCourseCard(courseCard);
-//            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        Stage stage = (Stage) namefield.getScene().getWindow();
-        stage.close();
-    }
+//            root.setCenter(courses);
+//
+////            CourseDAO.insertCourse(courseName, courseAbr, courseDescription, nbChapters, nbAssignments);
+////            System.out.println("Course created successfully.");
+////
+////            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/AvailableCourseCard_updated.fxml"));
+////            Pane courseCard = loader.load();
+////
+////            AvailableCourseCardController controller = loader.getController();
+////            controller.setCourseDetails(courseName, courseDescription, nbChapters);
+////
+////            if (coursesPanelController != null) {
+////                coursesPanelController.addCourseCard(courseCard);
+////            }
+//
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        Stage stage = (Stage) namefield.getScene().getWindow();
+//        stage.close();
+//    }
 
     @FXML
     void handleCancelAction(ActionEvent event) {

@@ -5,7 +5,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import com.example.moodle.Teacher.CoursesPanel.CourseViewPanelController;
-import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.Entities.Course;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -50,10 +50,10 @@ public class AvailableCourseCardController implements Initializable{
     }
 
     public void define(Course course) {
-        this.courseName.setText(course.getCourseName());
-        this.courseDesc.setText(course.getCourseDescription());
+        this.courseName.setText(course.getFullname());
+        this.courseDesc.setText(course.getSummary());
         this.courseDesc.setStyle("-fx-text-fill: black");
-        this.ChaptersNumber.setText(course.getNbChapters() + " Chapters");
+        this.ChaptersNumber.setText(course.getNumsections() + " Chapters");
         this.ChaptersNumber.setStyle("-fx-text-fill: black");
         this.cours = course;
     }

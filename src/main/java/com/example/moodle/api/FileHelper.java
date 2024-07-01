@@ -20,26 +20,35 @@ public class FileHelper {
             String res = RequestHelper.formRequest(urlStr);
             JSONParser parser = new JSONParser();
             JSONArray data = (JSONArray) parser.parse(res);
-            JSONObject section = (JSONObject) data.get((int)sectionid);
+            for(int j = 0; j < data.size(); j++) {
+                JSONObject section = (JSONObject) data.get(j);
+                if((Long) section.get("id") == sectionid) {
+                    JSONArray jsonArray = (JSONArray) section.get("modules");
+                    for(int i = 0; i < jsonArray.size(); i++) {
+                        JSONObject module = (JSONObject) jsonArray.get(i);
+                        if((Long) module.get("id") == moduleid) {
+                            if((Long)module.get("downloadcontent") == 1) {
+                                file = new File();
+                                JSONArray contents = (JSONArray) module.get("contents");
+                                if(contents != null) {
+                                    JSONObject content = (JSONObject) contents.get(0);
 
-            JSONArray jsonArray = (JSONArray) section.get("modules");
-            JSONObject module = (JSONObject) jsonArray.get((int)moduleid);
-            if((Long)module.get("downloadcontent") == 1) {
-                file = new File();
-                JSONArray contents = (JSONArray) module.get("contents");
-                JSONObject content = (JSONObject) contents.get(0);
+                                    file.setFilename(content.get("filename").toString());
+                                    file.setModuleid(moduleid);
+                                    file.setFilepath(content.get("filepath").toString());
+                                    file.setFilesize((Long)content.get("filesize"));
+                                    file.setFileurl(content.get("fileurl").toString());
+                                    file.setCreated((Long)content.get("timecreated"));
+                                    file.setUpdated((Long)content.get("timemodified"));
+                                    file.setRepositorytype("");
+                                    file.setMimetype(content.get("mimetype").toString());
+                                }
 
-                file.setFilename(content.get("filename").toString());
-                file.setModuleid(moduleid);
-                file.setFilepath(content.get("filepath").toString());
-                file.setFilesize((Long)content.get("filesize"));
-                file.setFileurl(content.get("fileurl").toString());
-                file.setCreated((Long)content.get("timecreated"));
-                file.setUpdated((Long)content.get("timemodified"));
-                file.setRepositorytype("");
-                file.setMimetype(content.get("mimetype").toString());
+                            }
+                        }
+                    }
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

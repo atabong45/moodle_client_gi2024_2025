@@ -6,6 +6,7 @@ import static com.example.moodle.moodleclient.Moodleclient.user;
 import com.example.moodle.HelloApplication;
 import com.example.moodle.MainDry.Dry;
 
+import com.example.moodle.moodleclient.Moodleclient;
 import com.example.moodle.moodleclient.client_moodle;
 import com.example.moodle.Entities.User;
 import com.example.moodle.api.UserHelper;
@@ -71,6 +72,7 @@ public class HelloController implements Initializable {
             if(user == null) {
                 return false;
             }
+            Moodleclient.user.setId(user.getUserid());
             UsersDAO.insertUser(user);
             return true;
         }
@@ -82,9 +84,11 @@ public class HelloController implements Initializable {
                 return false;
             }
             UsersDAO.insertUser(user);
+            Moodleclient.user.setId(user.getUserid());
             return true;
         }
         if(pass.equals(user.getPassword())) {
+            Moodleclient.user.setId(user.getUserid());
             return true;
         }
         return false;

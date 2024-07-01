@@ -39,9 +39,9 @@ public class EditCourseDialogController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        namefield.setText(currentCourse.getCourseName());
-        shortnamefield.setText(currentCourse.getCourseAbr());
-        descriptionfield.setText(currentCourse.getCourseDescription());
+        namefield.setText(currentCourse.getFullname());
+        shortnamefield.setText(currentCourse.getShortname());
+        descriptionfield.setText(currentCourse.getSummary());
     }
 
     @FXML
@@ -53,11 +53,11 @@ public class EditCourseDialogController implements Initializable {
         }
 
         try {
-            currentCourse.setCourseName(namefield.getText());
-            currentCourse.setCourseAbr(shortnamefield.getText());
-            currentCourse.setCourseDescription(descriptionfield.getText());
+            currentCourse.setFullname(namefield.getText());
+            currentCourse.setShortname(shortnamefield.getText());
+            currentCourse.setSummary(descriptionfield.getText());
 
-            CourseDAO.updateCourse(currentCourse.getId(), namefield.getText(), shortnamefield.getText(), descriptionfield.getText(), currentCourse.getNbChapters(), currentCourse.getNbAssignments());
+            CourseDAO.updateCourse((int) currentCourse.getCourseid(), namefield.getText(), shortnamefield.getText(), descriptionfield.getText(), currentCourse.getNumsections(), currentCourse.getNumsections());
             System.out.println("Course created successfully.");
 
             FXMLLoader courseviewloader = new FXMLLoader(CreateCourseDialogController.class.getResource("/com/example/moodle/FXML/CourseViewPanel_updated.fxml"));

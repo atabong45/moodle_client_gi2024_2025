@@ -1,12 +1,11 @@
 package com.example.moodle.Teacher.CoursesPanel;
 
+import com.example.moodle.Entities.Section;
 import com.example.moodle.MainDry.Dry;
-import com.example.moodle.Teacher.Cards.ChapterCard;
-import com.example.moodle.Teacher.Cards.CourseCard;
-import com.example.moodle.Teacher.CoursesPanel.DialogWindows.CreateChapterDialogController;
-import com.example.moodle.Teacher.CoursesPanel.DialogWindows.EditCourseDialogController;
+import com.example.moodle.Teacher.Cards.SectionCard;
 import com.example.moodle.Teacher.entity.Chapter;
-import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.api.SectionHelper;
+import com.example.moodle.dao.SectionDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -85,7 +84,7 @@ public class CourseViewPanelController implements Initializable {
     @FXML
     private Text chaptersTitle;
 
-    public static List<ChapterCard> Chapterslist;
+    public static List<SectionCard> Chapterslist;
 
     private Connection connect() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
@@ -93,8 +92,8 @@ public class CourseViewPanelController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        coursename.setText(currentCourse.getCourseName());
-        courseDescription.setText(currentCourse.getCourseDescription());
+        coursename.setText(currentCourse.getFullname());
+        courseDescription.setText(currentCourse.getSummary());
 
         Chapterslist = new ArrayList<>();
         ChaptersVbox.getChildren().clear();
@@ -190,36 +189,30 @@ public class CourseViewPanelController implements Initializable {
 
     }
 
-    public void addChapterCard(ChapterCard chap){
+    public void addChapterCard(SectionCard chap){
 
         Chapterslist.add(chap);
         ChaptersVbox.getChildren().clear();
 
-        for (ChapterCard ch : Chapterslist){
+        for (SectionCard ch : Chapterslist){
             ChaptersVbox.getChildren().add(ch);
         }
     }
 
     public void loadChaptersFromDatabase() {
-        String query = "SELECT * FROM chapters WHERE courseId = '" + currentCourse.getId() + "'";
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement(query);
-             ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()) {
-
-                Chapter chap = new Chapter(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getInt("num"),
-                        rs.getString("content"),
-                        rs.getInt("courseId")
-                );
-
-                ChaptersVbox.getChildren().clear();
-                addChapterCard(new ChapterCard(chap));
+        ArrayList<Section> sections = SectionDAO.getSections(currentCourse.getCourseid());
+        if(sections.size() == 0) {
+            SectionHelper sectionHelper = new SectionHelper();
+            sections = sectionHelper.getSections(currentCourse.getCourseid());
+            if(sections.size() != 0) {
+                for(Section section: sections) {
+                    SectionDAO.insertSection(section);
+                }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }
+        for (Section section: sections) {
+            ChaptersVbox.getChildren().clear();
+            addChapterCard(new SectionCard(section));
         }
     }
 

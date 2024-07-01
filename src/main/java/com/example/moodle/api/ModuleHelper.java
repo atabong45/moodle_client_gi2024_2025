@@ -20,23 +20,25 @@ public class ModuleHelper {
             String res = RequestHelper.formRequest(urlStr);
             JSONParser parser = new JSONParser();
             JSONArray data = (JSONArray) parser.parse(res);
-            JSONObject section = (JSONObject) data.get((int)sectionid);
+            for (int j = 0; j < data.size(); j++) {
+                JSONObject section = (JSONObject) data.get(j);
+                if((Long) section.get("id") == sectionid) {
+                    JSONArray jsonArray = (JSONArray) section.get("modules");
+                    for(int i = 0; i < jsonArray.size(); i++) {
+                        JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 
-            JSONArray jsonArray = (JSONArray) section.get("modules");
-            for(int i = 0; i < jsonArray.size(); i++) {
-                JSONObject jsonObject = (JSONObject) jsonArray.get(i);
+                        Module module = new Module();
+                        module.setCmid((Long)jsonObject.get("id"));
+                        module.setSectionid(sectionid);
+                        module.setName(jsonObject.get("name").toString());
+                        module.setModname(jsonObject.get("modname").toString());
+                        module.setModplural(jsonObject.get("modplural").toString());
+                        module.setDownloadcontent((Long)jsonObject.get("downloadcontent"));
 
-                Module module = new Module();
-                module.setCmid((Long)jsonObject.get("id"));
-                module.setSectionid(sectionid);
-                module.setName(jsonObject.get("name").toString());
-                module.setModname(jsonObject.get("modname").toString());
-                module.setModplural(jsonObject.get("modplural").toString());
-                module.setDownloadcontent((Long)jsonObject.get("downloadcontent"));
-
-                modules.add(module);
+                        modules.add(module);
+                    }
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

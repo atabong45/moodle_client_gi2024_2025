@@ -26,8 +26,7 @@ CREATE TABLE IF NOT EXISTS course (
     studentid INT,
     teacherid INT,
     PRIMARY KEY (courseid, studentid),
-    FOREIGN KEY (studentid) REFERENCES user(userid),
-    FOREIGN KEY (teacherid) REFERENCES user(userid)
+    FOREIGN KEY (studentid) REFERENCES user(userid)
 );
 
 DROP TABLE IF EXISTS section;
@@ -107,4 +106,12 @@ CREATE TABLE IF NOT EXISTS grade (
     comment VARCHAR(255),
     FOREIGN KEY (submissionid) REFERENCES submission(submissionid),
     FOREIGN KEY (grader) REFERENCES user(userid)
+);
+
+DROP TABLE IF EXISTS downloaded_files;
+CREATE TABLE IF NOT EXISTS downloaded_files(
+    course_id int,
+    topic_name varchar(255),
+    file_name varchar(255),
+    file_path varchar(255)
 );

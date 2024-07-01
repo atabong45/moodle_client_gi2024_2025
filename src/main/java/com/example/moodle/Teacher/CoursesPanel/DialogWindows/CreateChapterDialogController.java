@@ -1,23 +1,13 @@
 package com.example.moodle.Teacher.CoursesPanel.DialogWindows;
 
-import com.example.moodle.Teacher.Cards.ChapterCard;
-import com.example.moodle.Teacher.Cards.CourseCard;
-import com.example.moodle.Teacher.CoursesPanel.CourseViewPanelController;
-import com.example.moodle.Teacher.CoursesPanel.CoursesPanelController;
-import com.example.moodle.Teacher.entity.Chapter;
-import com.example.moodle.Teacher.entity.Course;
-import com.example.moodle.dao.ChaptersDAO;
 import com.example.moodle.dao.CourseDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -50,8 +40,8 @@ public class CreateChapterDialogController implements Initializable {
 
         try {
             // ChaptersDAO.insertChapter(namefield.getText(), Integer.parseInt(numfield.getText()), "", currentCourse.getId());
-            currentCourse.setNbChapters(currentCourse.getNbChapters() + 1);
-            CourseDAO.updateCourse(currentCourse.getId(),currentCourse.getCourseName(), currentCourse.getCourseAbr(), currentCourse.getCourseDescription(), currentCourse.getNbChapters(), currentCourse.getNbAssignments());
+            currentCourse.setNumsections(currentCourse.getNumsections() + 1);
+            CourseDAO.updateCourse((int) currentCourse.getCourseid(),currentCourse.getFullname(), currentCourse.getShortname(), currentCourse.getShortname(), currentCourse.getNumsections(), currentCourse.getNumsections());
             System.out.println("Course created successfully.");
 
             FXMLLoader coursVloader = new FXMLLoader(CreateChapterDialogController.class.getResource("/com/example/moodle/FXML/CourseViewPanel_updated.fxml"));

@@ -15,6 +15,7 @@ import com.example.moodle.Login.HelloController;
 
 import com.example.moodle.Privatefiles.PrivateFile;
 import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.Teacher.entity.CoursePull;
 import com.example.moodle.moodleclient.Moodleclient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,8 +42,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -52,7 +55,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.example.moodle.DBConnection.*;
 import static com.example.moodle.HelloApplication.stage;
+import static com.example.moodle.moodleclient.client_moodle.username;
+import static com.example.moodle.moodleclient.Moodleclient.superToken;
 import static com.example.moodle.moodleclient.Moodleclient.user;
 
 
@@ -109,12 +115,13 @@ public class TopDashboardController implements Initializable{
         private Label username;
 
     private static ObservableList<Course> courList = FXCollections.observableArrayList();
-
-
     static List<PrivateFile> privateFiles = new ArrayList<>();
+    static List<CoursePull> userCourses = new ArrayList<>();
+
+
 
     private static final String SERVER_ADDRESS = "http://localhost/";
-    private static final String TOKEN = "70ee2f13a67b858438afd8ddb3525854";
+
 
     private static final String REQUEST_URL = "http://localhost/login/token.php?username=camrole&password=Camrole-5000&service=SMAS";
 
@@ -162,8 +169,26 @@ public class TopDashboardController implements Initializable{
 
         @FXML
         void handleSyncBtn(ActionEvent event) {
-            //SyncroniserCour();
-            uploadFileToDraftArea("C:\\Users\\user\\Downloads\\TutoSMA.pdf");
+            //pull des fichier des cour au quel le user est inscrit
+            getCoursesOfUser();
+            getdownloadfileAndStoreDB();
+
+
+        //action de syncronisatiion du cours
+            SyncroniserCour();
+            //action de syncronisation des fichier privés
+            List<PrivateFile> privatesyncrofiles=readPrivateFilessyncro();
+            for(PrivateFile prifiles:privatesyncrofiles){
+                String draftId = uploadFileToDraftArea(prifiles.getFilePath());
+                if (draftId != null) {
+                    moveToUserPrivateFiles(draftId);
+                }
+            }
+
+
+
+
+
 
 
             // Logic for sync button
@@ -171,11 +196,9 @@ public class TopDashboardController implements Initializable{
         }
 
     public static void readCoursessyncro() {
-        String URL = "jdbc:mysql://localhost:3307/moodleclient";
-        String user = "root";
-        String password = "root";
+
         String query = "SELECT id,courseName,courseAbr,courseDescription,nbChapters,nbAssignments FROM Course";
-        try (Connection connection = DriverManager.getConnection(URL,user, password);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -195,12 +218,10 @@ public class TopDashboardController implements Initializable{
         }
     }
     public static List<PrivateFile> readPrivateFilessyncro() {
-        String URL = "jdbc:mysql://localhost:3307/moodleclient";
-        String user = "root";
-        String password = "root";
+
 
         String query = "SELECT * FROM private_files";
-        try (Connection connection = DriverManager.getConnection(URL,user, password);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -217,60 +238,8 @@ public class TopDashboardController implements Initializable{
         return privateFiles;
     }
 
-    private static String uploadFileToDraftArea(String filePath) {
-        File file = new File(filePath);
-        if (!file.exists() || !file.canRead()) {
-            System.err.println("Cannot access file: " + filePath);
-            return null;
-        }
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + Moodleclient.superToken);
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addBinaryBody("file_1", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
-            HttpEntity multipart = builder.build();
-            uploadFile.setEntity(multipart);
 
-            HttpResponse response = httpClient.execute(uploadFile);
-            HttpEntity responseEntity = response.getEntity();
-            String responseString = EntityUtils.toString(responseEntity);
-
-            System.out.println("Upload response: " + responseString);
-
-            if (responseString.startsWith("[")) {
-                JSONArray jsonResponse = new JSONArray(responseString);
-                JSONObject jsonObject = jsonResponse.getJSONObject(0);
-                return String.valueOf(jsonObject.getLong("itemid"));
-            } else if (responseString.startsWith("{")) {
-                JSONObject jsonResponse = new JSONObject(responseString);
-                return String.valueOf(jsonResponse.getLong("itemid"));
-            } else {
-                System.err.println("Unexpected response format: " + responseString);
-                return null;
-            }
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    private static void moveToUserPrivateFiles(String draftId) {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost post = new HttpPost(SERVER_ADDRESS + "webservice/rest/server.php?moodlewsrestformat=json");
-            List<NameValuePair> urlParameters = new ArrayList<>();
-            urlParameters.add(new BasicNameValuePair("draftid", draftId));
-            urlParameters.add(new BasicNameValuePair("wsfunction", "core_user_add_user_private_files"));
-            urlParameters.add(new BasicNameValuePair("wstoken", TOKEN));
-
-            post.setEntity(new UrlEncodedFormEntity(urlParameters));
-            HttpResponse response = httpClient.execute(post);
-            HttpEntity responseEntity = response.getEntity();
-            String responseString = EntityUtils.toString(responseEntity);
-
-            System.out.println("Move to private files response: " + responseString);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void SyncroniserCour() {
         readCoursessyncro();
@@ -362,6 +331,280 @@ public class TopDashboardController implements Initializable{
         } catch (org.json.JSONException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+
+
+
+    private static String uploadFileToDraftArea(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists() || !file.canRead()) {
+            System.err.println("Cannot access file: " + filePath);
+            return null;
+        }
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + superToken);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.addBinaryBody("file_1", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
+            HttpEntity multipart = builder.build();
+            uploadFile.setEntity(multipart);
+
+            HttpResponse response = httpClient.execute(uploadFile);
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+
+            System.out.println("Upload response: " + responseString);
+
+            if (responseString.startsWith("[")) {
+                JSONArray jsonResponse = new JSONArray(responseString);
+                JSONObject jsonObject = jsonResponse.getJSONObject(0);
+                return String.valueOf(jsonObject.getLong("itemid"));
+            } else if (responseString.startsWith("{")) {
+                JSONObject jsonResponse = new JSONObject(responseString);
+                return String.valueOf(jsonResponse.getLong("itemid"));
+            } else {
+                System.err.println("Unexpected response format: " + responseString);
+                return null;
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static void moveToUserPrivateFiles(String draftId) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost post = new HttpPost(SERVER_ADDRESS + "webservice/rest/server.php?moodlewsrestformat=json");
+            List<NameValuePair> urlParameters = new ArrayList<>();
+            urlParameters.add(new BasicNameValuePair("draftid", draftId));
+            urlParameters.add(new BasicNameValuePair("wsfunction", "core_user_add_user_private_files"));
+            urlParameters.add(new BasicNameValuePair("wstoken", superToken));
+
+            post.setEntity(new UrlEncodedFormEntity(urlParameters));
+            HttpResponse response = httpClient.execute(post);
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+
+            System.out.println("Move to private files response: " + responseString);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    //PULL DES COURS
+
+
+    public void getCoursesOfUser() {
+        try {
+            int userId = getUserId(user.getUsername());
+            if (userId != -1) {
+                userCourses = getUserEnrolledCourses(userId);
+
+                // Print user enrolled courses
+                for (CoursePull course : userCourses) {
+                    System.out.println("Course ID: " + course.id + ", Course Name: " + course.getFullname());
+                }
+            } else {
+                System.out.println("User not found.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void getdownloadfileAndStoreDB() {
+
+        try {
+
+            // For each course, retrieve and process course contents
+            for (CoursePull course : userCourses) {
+                JSONArray courseContents = getCourseContents(course.id);
+
+                for (int i = 0; i < courseContents.length(); i++) {
+                    JSONObject topic = courseContents.getJSONObject(i);
+                    String topicName = topic.getString("name");
+                    System.out.println("Topic: " + topicName);
+
+                    JSONArray modules = topic.getJSONArray("modules");
+                    for (int j = 0; j < modules.length(); j++) {
+                        JSONObject module = modules.getJSONObject(j);
+                        if (module.has("contents")) {
+                            JSONArray contents = module.getJSONArray("contents");
+
+                            for (int k = 0; k < contents.length(); k++) {
+                                JSONObject content = contents.getJSONObject(k);
+                                String fileName = content.getString("filename");
+                                String fileUrl = content.getString("fileurl");
+
+                                // Download the file
+                                String filePath = downloadFile(fileUrl, fileName);
+
+                                // Store the file path in the database
+                                storeFilePathInDatabase(course.id, topicName, fileName, filePath);
+
+                                System.out.println("    File: " + fileName + " downloaded to " + filePath);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+    private static int getUserId(String username) throws Exception {
+        String urlString = "http://localhost/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_user_get_users&wstoken=" + superToken + "&criteria[0][key]=username&criteria[0][value]=" + user.getUsername();
+        JSONObject response = getJsonObjectFromUrl(urlString);
+        JSONArray usersArray = response.getJSONArray("users");
+
+        if (usersArray.length() > 0) {
+            JSONObject userJson = usersArray.getJSONObject(0);
+            return userJson.getInt("id");
+        } else {
+            return -1; // User not found
+        }
+    }
+
+    private static List<CoursePull> getUserEnrolledCourses(int userId) throws Exception {
+        String urlString = "http://localhost/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_enrol_get_users_courses&wstoken=" + superToken + "&userid=" + userId;
+        JSONArray coursesArray = getJsonArrayFromUrl(urlString);
+
+        List<CoursePull> courses = new ArrayList<>();
+        for (int i = 0; i < coursesArray.length(); i++) {
+            JSONObject courseJson = coursesArray.getJSONObject(i);
+            CoursePull course = new CoursePull(
+                    courseJson.getInt("id"),
+                    courseJson.getString("fullname"),
+                    courseJson.getString("shortname"),
+                    courseJson.getLong("startdate"),
+                    courseJson.getLong("enddate")
+
+            );
+            courses.add(course);
+        }
+        return courses;
+    }
+
+    private static JSONObject getJsonObjectFromUrl(String urlString) throws Exception {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String inputLine;
+        StringBuilder content = new StringBuilder();
+
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        in.close();
+        conn.disconnect();
+
+        return new JSONObject(content.toString());
+    }
+
+    private static JSONArray getJsonArrayFromUrl(String urlString) throws Exception {
+        URL url = new URL(urlString);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String inputLine;
+        StringBuilder content = new StringBuilder();
+
+        while ((inputLine = in.readLine()) != null) {
+            content.append(inputLine);
+        }
+
+        in.close();
+        conn.disconnect();
+
+        return new JSONArray(content.toString());
+    }
+
+
+    private static JSONArray getCourseContents(int courseId) throws Exception {
+        String urlString = "http://localhost/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_course_get_contents&wstoken=" + superToken + "&courseid=" + courseId;
+        return getJsonArrayFromUrl(urlString);
+    }
+
+    private static String downloadFile(String fileUrl, String fileName) throws Exception {
+        URL url = new URL(fileUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        String filePath = "D:\\downloadedmoddlefiles\\" + fileName;  // Define your file path here
+        try (InputStream in = conn.getInputStream();
+             FileOutputStream out = new FileOutputStream(filePath)) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = in.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+        conn.disconnect();
+        return filePath;
+    }
+
+    private static void storeFilePathInDatabase(int courseId, String topicName, String fileName, String filePath) throws SQLException {
+        Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
+        String query = "INSERT INTO downloaded_files (course_id, topic_name, file_name, file_path) VALUES (?, ?, ?, ?)";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, courseId);
+            preparedStatement.setString(2, topicName);
+            preparedStatement.setString(3, fileName);
+            preparedStatement.setString(4, filePath);
+            preparedStatement.executeUpdate();
+        }
+    }
+
+
+
+
+
+
+    private static boolean saveFileToCourseModule(String draftItemId, int contextId, int moduleId, String fileName, String filePath) {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost postRequest = new HttpPost(SERVER_ADDRESS + "webservice/rest/server.php?wstoken=" + superToken + "&moodlewsrestformat=json&wsfunction=core_files_upload");
+
+            // Construct the JSON payload
+            JSONObject jsonPayload = new JSONObject();
+            jsonPayload.put("contextid", contextId);
+            jsonPayload.put("component", "mod_resource");
+            jsonPayload.put("filearea", "content");
+            jsonPayload.put("itemid", draftItemId);
+            jsonPayload.put("filepath", filePath);
+            jsonPayload.put("filename", fileName);
+            jsonPayload.put("contextlevel", "module");
+            jsonPayload.put("instanceid", moduleId);
+
+            StringEntity entity = new StringEntity(jsonPayload.toString());
+            postRequest.setEntity(entity);
+            postRequest.setHeader("Content-Type", "application/json");
+
+            CloseableHttpResponse response = httpClient.execute(postRequest);
+            String responseString = EntityUtils.toString(response.getEntity());
+            System.out.println("Move file response: " + responseString);
+
+            JSONObject jsonResponse = new JSONObject(responseString);
+            return jsonResponse.has("contextid");
+
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 

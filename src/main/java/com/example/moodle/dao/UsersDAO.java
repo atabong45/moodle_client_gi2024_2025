@@ -1,6 +1,6 @@
 package com.example.moodle.dao;
 
-import com.example.moodle.Student.Entities.User;
+import com.example.moodle.Entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -51,7 +51,7 @@ public class UsersDAO {
             statement.setString(5, user.getPicture());
             statement.setInt(6, user.getRole());
             statement.executeUpdate();
-            System.out.println("Users inserted successfully.");
+            System.out.println("User inserted successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
         }
