@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 public class SubmissionHelper {
     private static final String GET_SUBMISSIONS = "mod_assign_get_submissions";
+    private static final String SAVE_SUBMISSION = "mod_assign_save_submission";
 
     public SubmissionHelper() {
     }
@@ -79,5 +80,23 @@ public class SubmissionHelper {
             e.printStackTrace();
         }
         return submissions;
+    }
+
+    public boolean saveSubmission(long assignmentid, long itemid) {
+        String urlStr = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.superToken + "&wsfunction=" + SAVE_SUBMISSION + "&moodlewsrestformat=json&assignmentid=" + assignmentid +
+                "&plugindata[files_filemanager]=" + itemid;
+        try {
+             String res = RequestHelper.formRequest(urlStr);
+             JSONParser parser = new JSONParser();
+             JSONArray data = (JSONArray) parser.parse(res);
+             for(int i = 0; i < data.size(); i++) {
+                 JSONObject object = (JSONObject) data.get(i);
+                 if(object.keySet().contains("item")) return true;
+             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }

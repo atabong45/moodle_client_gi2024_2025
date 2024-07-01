@@ -43,4 +43,19 @@ public class GradeHelper {
         }
         return grade;
     }
+
+    public boolean saveGrade(long assignmentid, long userid, long grade, String token) {
+        String urlStr = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + token + "&wsfunction=" + SAVE_GRADE +
+                "&moodlewsrestformat=json&assignmentid=" + assignmentid + "&userid=" + userid + "&grade=" + grade +
+                "&attemptnumber=-1&addattempt=0&workflowstate=graded&applytoall=0";
+        try {
+            String res = RequestHelper.formRequest(urlStr);
+            if (res.toString().equals("null")) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }
