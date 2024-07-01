@@ -1,15 +1,15 @@
 package com.example.moodle.dao;
 
-import com.example.moodle.Student.Entities.User;
+import com.example.moodle.Entities.User;
 
 import java.sql.*;
 import java.util.ArrayList;
 
 public class UsersDAO {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/moodleclient";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/moodleclient";
     private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
+    private static final String PASSWORD = "";
 
     public static void main(String[] args) {
         try {

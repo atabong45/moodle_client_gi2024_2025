@@ -3,7 +3,7 @@ package com.example.moodle.Student.StudentCoursesPanel;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import com.example.moodle.Student.Entities.Course;
+import com.example.moodle.Entities.Course;
 import com.example.moodle.moodleclient.Moodleclient;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

@@ -1,23 +1,17 @@
 package com.example.moodle.Student.StudentCoursesPanel;
 
 import java.net.URL;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
 import com.example.moodle.Student.Cards.CourseCard;
 import com.example.moodle.api.CourseHelper;
-import com.example.moodle.dao.CourseDAO;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-
-import static com.example.moodle.dao.CourseDAO.*;
 
 public class StudentCoursesPanelController implements Initializable{
     private static final String JDBC_URL = "jdbc:mysql://localhost:3307/moodleclient";
@@ -42,7 +36,7 @@ public class StudentCoursesPanelController implements Initializable{
 
         CourseHelper courseHelper = new CourseHelper();
 
-        ArrayList<com.example.moodle.Student.Entities.Course> courses = courseHelper.getEnrolledCourses(2);
+        ArrayList<com.example.moodle.Entities.Course> courses = courseHelper.getEnrolledCourses(2);
 //        courses.add(new Course("Architecture des ordinateurs", "Venez découvrir le concept de microcontrôleur et d'électronique", 3));
 //        courses.add(new Course("Réseaux mobiles et intelligents", "Ne voulez-vous pas savoir comment les réseaux de téléponie fonctionnent", 11));
 //        courses.add(new Course("Management", "Apprendre à se gérer et gérer les autres", 5));

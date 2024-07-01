@@ -1,11 +1,7 @@
 package com.example.moodle.Student.Cards;
 
-import com.example.moodle.Student.Entities.Section;
-import com.example.moodle.Student.StudentCoursesPanel.ChapTileController;
-import javafx.fxml.FXMLLoader;
+import com.example.moodle.Entities.Section;
 import javafx.scene.layout.Pane;
-
-import java.io.IOException;
 
 public class ChapTile extends Pane {
     private Pane pane;

@@ -1,7 +1,6 @@
 package com.example.moodle.Student.StudentCoursesPanel;
 
-import com.example.moodle.Student.Cards.CourseCard;
-import com.example.moodle.Student.Entities.Course;
+import com.example.moodle.Entities.Course;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 

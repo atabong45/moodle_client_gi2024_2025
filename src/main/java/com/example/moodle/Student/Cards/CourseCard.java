@@ -1,8 +1,7 @@
 package com.example.moodle.Student.Cards;
 
-import com.example.moodle.Student.Entities.Course;
+import com.example.moodle.Entities.Course;
 import com.example.moodle.Student.StudentCoursesPanel.StudentAvailableCourseCardController;
-import com.example.moodle.Teacher.CoursesPanel.AvailableCourseCard.AvailableCourseCardController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.Pane;
 

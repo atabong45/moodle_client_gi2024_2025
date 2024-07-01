@@ -1,4 +1,4 @@
-package com.example.moodle.Student.Entities;
+package com.example.moodle.Entities;
 
 public class User {
     private long userid;

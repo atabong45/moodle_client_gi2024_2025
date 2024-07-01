@@ -2,8 +2,8 @@ package com.example.moodle.Student.StudentCoursesPanel;
 
 import com.example.moodle.MainDry.Dry;
 import com.example.moodle.Student.Cards.ChapTile;
-import com.example.moodle.Student.Entities.Section;
-import com.example.moodle.Student.Entities.Course;
+import com.example.moodle.Entities.Section;
+import com.example.moodle.Entities.Course;
 import com.example.moodle.dao.SectionDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

@@ -1,6 +1,6 @@
 package com.example.moodle.dao;
 
-import com.example.moodle.Student.Entities.Section;
+import com.example.moodle.Entities.Section;
 
 import java.sql.*;
 import java.util.ArrayList;

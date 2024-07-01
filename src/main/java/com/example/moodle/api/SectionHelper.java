@@ -1,6 +1,6 @@
 package com.example.moodle.api;
 
-import com.example.moodle.Student.Entities.Section;
+import com.example.moodle.Entities.Section;
 import com.example.moodle.moodleclient.Moodleclient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

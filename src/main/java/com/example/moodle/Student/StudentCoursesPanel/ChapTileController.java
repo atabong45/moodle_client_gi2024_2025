@@ -1,14 +1,10 @@
 package com.example.moodle.Student.StudentCoursesPanel;
 
-import com.example.moodle.Student.Entities.Section;
+import com.example.moodle.Entities.Section;
 import javafx.fxml.FXML;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
-
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 public class ChapTileController {
     private Section section;

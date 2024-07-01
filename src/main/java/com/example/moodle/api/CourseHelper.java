@@ -1,10 +1,7 @@
 package com.example.moodle.api;
 
-import com.example.moodle.Student.Entities.Course;
-import com.example.moodle.Student.Entities.Section;
-import com.example.moodle.Student.Entities.User;
-import com.example.moodle.dao.CourseDAO;
-import com.example.moodle.dao.UsersDAO;
+import com.example.moodle.Entities.Course;
+import com.example.moodle.Entities.User;
 import com.example.moodle.moodleclient.Moodleclient;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

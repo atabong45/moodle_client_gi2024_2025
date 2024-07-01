@@ -15,6 +15,7 @@ import com.example.moodle.Login.HelloController;
 
 import com.example.moodle.Privatefiles.PrivateFile;
 import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.moodleclient.Moodleclient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -161,7 +162,9 @@ public class TopDashboardController implements Initializable{
 
         @FXML
         void handleSyncBtn(ActionEvent event) {
-            SyncroniserCour();
+            //SyncroniserCour();
+            uploadFileToDraftArea("C:\\Users\\user\\Downloads\\TutoSMA.pdf");
+
 
             // Logic for sync button
             System.out.println("Sync Clicked");
@@ -222,7 +225,7 @@ public class TopDashboardController implements Initializable{
         }
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + TOKEN);
+            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + Moodleclient.superToken);
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.addBinaryBody("file_1", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
             HttpEntity multipart = builder.build();
