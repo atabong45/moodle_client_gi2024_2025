@@ -9,13 +9,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.moodle.DBConnection.*;
+
 public class AssignmentDAO {
 
 
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/moodleclient";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
+
 
     public static void main(String[] args) {
         try {
@@ -48,7 +48,7 @@ public class AssignmentDAO {
     // Méthode pour insérer un devoir
     public static void insertAssignment(String assignmentName, Date createdDate, Date limitedDate, String courseName, String statut) {
         String query = "INSERT INTO assignments (assignmentName, createdDate, limitedDate, courseName, statut) VALUES (?, ?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
 
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, assignmentName);

@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static com.example.moodle.DBConnection.*;
 import static com.example.moodle.moodleclient.Moodleclient.currentCourse;
 import static com.example.moodle.moodleclient.Moodleclient.root;
 
@@ -87,10 +88,7 @@ public class CourseViewPanelController implements Initializable {
     public static List<ChapterCard> Chapterslist;
 
     private Connection connect() throws SQLException {
-        String url = "jdbc:mysql://localhost:3306/moodleclient";
-        String user = "root";
-        String password = "root";
-        return DriverManager.getConnection(url, user, password);
+        return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
     }
 
     @Override

@@ -49,7 +49,7 @@ public class CreateChapterDialogController implements Initializable {
         }
 
         try {
-            ChaptersDAO.insertChapter(namefield.getText(), Integer.parseInt(numfield.getText()), "", currentCourse.getId());
+            // ChaptersDAO.insertChapter(namefield.getText(), Integer.parseInt(numfield.getText()), "", currentCourse.getId());
             currentCourse.setNbChapters(currentCourse.getNbChapters() + 1);
             CourseDAO.updateCourse(currentCourse.getId(),currentCourse.getCourseName(), currentCourse.getCourseAbr(), currentCourse.getCourseDescription(), currentCourse.getNbChapters(), currentCourse.getNbAssignments());
             System.out.println("Course created successfully.");

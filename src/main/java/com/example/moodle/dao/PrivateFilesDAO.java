@@ -6,12 +6,12 @@ import java.util.List;
 import com.example.moodle.Privatefiles.PrivateFile;
 import com.example.moodle.Student.StudentPrivateFiles.PrivateFile1;
 
+import static com.example.moodle.DBConnection.*;
+
 
 public class PrivateFilesDAO {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/moodleclient";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
+
 
     public static void main(String[] args) {
         try {
@@ -43,7 +43,7 @@ public class PrivateFilesDAO {
 
     public static void insertPrivateFile(String fileName, long fileSize, String fileType, String filePath) {
         String query = "INSERT INTO private_files (fileName, fileSize, fileType, filePath) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, fileName);
             statement.setLong(2, fileSize);
@@ -60,7 +60,7 @@ public class PrivateFilesDAO {
     public static List<PrivateFile> readPrivateFiles() {
         List<PrivateFile> privateFiles = new ArrayList<>();
         String query = "SELECT * FROM private_files";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -80,7 +80,7 @@ public class PrivateFilesDAO {
     public static List<PrivateFile1> readPrivateFiles1() {
         List<PrivateFile1> privateFiles1 = new ArrayList<>();
         String query = "SELECT * FROM private_files";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
@@ -99,7 +99,7 @@ public class PrivateFilesDAO {
     // Méthode pour mettre à jour un fichier privé
     public static void updatePrivateFile(int id, String fileName, long fileSize, String fileType, String filePath) {
         String query = "UPDATE private_files SET fileName = ?, fileSize = ?, fileType = ?, filePath = ? WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, fileName);
             statement.setLong(2, fileSize);
@@ -116,7 +116,7 @@ public class PrivateFilesDAO {
     // Méthode pour supprimer un fichier privé
     public static void deletePrivateFile(int id) {
         String query = "DELETE FROM private_files WHERE id = ?";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);
+        try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
             statement.executeUpdate();
