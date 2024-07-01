@@ -1,25 +1,21 @@
 package com.example.moodle.MainDry;
 
-import java.io.IOException;
-
-import com.example.moodle.Dashboard.TopDashboardController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 
+import java.io.IOException;
 public class Dry {
     public static FXMLLoader contentLoader;
-    public Dry(){
-        
+
+    public Dry() {
+
     }
-    
-    public static void showDashboard(BorderPane root, boolean isTeacher) throws IOException{
-        if(isTeacher) {
+
+    public static void showDashboard(BorderPane root, boolean isTeacher) throws IOException {
+        if (isTeacher) {
             FXMLLoader loader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/topDashboard_updated.fxml"));
-
-
-
             AnchorPane topMenu = loader.load();
 
             Label username = (Label) loader.getNamespace().get("username");
@@ -35,7 +31,7 @@ public class Dry {
             // root.setRight(rightMenu);
 
             //Le leftMenu se charge de mettre à jour le contenu central donc, plus besoin de ceci.
-            FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursesPanel_updated.fxml"));
+            FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
             AnchorPane content = contentLoader.load();
             root.setCenter(content);
         } else {
@@ -59,6 +55,10 @@ public class Dry {
             AnchorPane content = contentLoader.load();
             root.setCenter(content);
         }
+    }
+}
+
+
 
 
 
@@ -69,10 +69,28 @@ public class Dry {
         // root.setRight(rightMenu);
         
         //Le leftMenu se charge de mettre à jour le contenu central donc, plus besoin de ceci.
+
+        //FXMLLoader leftLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/leftDashboard_updated.fxml"));
+        //AnchorPane leftMenu = leftLoader.load();
+        //root.setLeft(leftMenu);
+        //// AnchorPane rightMenu =  (AnchorPane)FXMLLoader.load(Dry.class.getResource("/SDashboard/rightDashboard.fxml"));
+        //// root.setRight(rightMenu);
+        //
+        ////Le leftMenu se charge de mettre à jour le contenu central donc, plus besoin de ceci.
+        //FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursesPanel_updated.fxml"));
+        //AnchorPane content = contentLoader.load();
+        //root.setCenter(content);
+
+
        // FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursesPanel_updated.fxml"));
         //AnchorPane content = contentLoader.load();
         //root.setCenter(content);
 
-    }
+       /* FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
 
-}
+        AnchorPane content = contentLoader.load();
+        root.setCenter(content);*/
+
+
+
+

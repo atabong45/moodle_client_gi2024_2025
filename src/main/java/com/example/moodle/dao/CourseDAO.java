@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class CourseDAO {
 
-    private static final String JDBC_URL = "jdbc:mysql://localhost:3306/moodleclient";
+    private static final String JDBC_URL = "jdbc:mysql://localhost:3307/moodleclient";
     private static final String USERNAME = "root";
     private static final String PASSWORD = "root";
 
@@ -152,5 +152,8 @@ public class CourseDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void insertCourse(String text, String text1, String text2, int nbChapters, int nbAssignments) {
     }
 }

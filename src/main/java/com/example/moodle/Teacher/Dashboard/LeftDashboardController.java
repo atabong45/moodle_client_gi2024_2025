@@ -41,12 +41,16 @@ public class LeftDashboardController implements Initializable{
     private boolean isMenuExpanded = true;
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
+        selectBtn(vbox, Coursesbtn);
     }
 
     @FXML
-    void handleAssignmentsbtn(ActionEvent event) {
+    void handleAssignmentsbtn(ActionEvent event) throws IOException {
         selectBtn(vbox, Assignmentsbtn);
+        FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/TeacherAssignmentPanel.fxml"));
+        AnchorPane content = contentLoader.load();
+        root.setCenter(content);
+
 
     }
 
@@ -64,7 +68,7 @@ public class LeftDashboardController implements Initializable{
     void handleCoursesbtn(ActionEvent event) throws IOException {
         selectBtn(vbox, Coursesbtn);
 
-        FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursesPanel_updated.fxml"));
+        FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
         AnchorPane content = contentLoader.load();
         root.setCenter(content);
 
