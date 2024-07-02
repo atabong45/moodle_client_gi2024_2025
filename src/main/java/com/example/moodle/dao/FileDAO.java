@@ -39,7 +39,7 @@ public class FileDAO {
             PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setLong(1, file.getModuleid());
             statement.setString(2, file.getFilename());
-            statement.setString(3, file.getFilepath());
+            statement.setString(3, "D:\\downloadedmoddlefiles\\" + file.getFilename());
             statement.setLong(4, file.getFilesize());
             statement.setString(5, file.getFileurl());
             statement.setString(6, file.getMimetype());

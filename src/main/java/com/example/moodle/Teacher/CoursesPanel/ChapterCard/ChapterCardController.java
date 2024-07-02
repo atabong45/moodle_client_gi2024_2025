@@ -2,10 +2,6 @@ package com.example.moodle.Teacher.CoursesPanel.ChapterCard;
 
 import com.example.moodle.Entities.Module;
 import com.example.moodle.Entities.Section;
-import com.example.moodle.Teacher.CoursesPanel.CourseViewPanelController;
-import com.example.moodle.Teacher.CoursesPanel.DialogWindows.CreateChapterDialogController;
-import com.example.moodle.Teacher.entity.Chapter;
-import com.example.moodle.Teacher.entity.DocumentFile;
 import com.example.moodle.api.FileHelper;
 import com.example.moodle.api.ModuleHelper;
 import com.example.moodle.dao.CourseDAO;
@@ -110,16 +106,16 @@ public class ChapterCardController implements Initializable {
     void deleteChapter(MouseEvent event) {
 
         try (Connection conn = connect();
-             PreparedStatement statement = conn.prepareStatement("DELETE FROM documents_files WHERE chapterId = ?")) {
-            statement.setLong(1, section.getCourseid());
+             PreparedStatement statement = conn.prepareStatement("DELETE FROM section WHERE sectionid = ?")) {
+            statement.setLong(1, section.getSectionid());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM chapters WHERE id = ?")) {
-            pstmt.setLong(1, section.getCourseid());
+             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM module WHERE sectionid = ?")) {
+            pstmt.setLong(1, section.getSectionid());
             pstmt.executeUpdate();
             System.out.println("Chapter deleted successfully.");
 
@@ -248,7 +244,7 @@ public class ChapterCardController implements Initializable {
     }
 
     private void deleteDocFile(Text fileName, MouseEvent event) {
-        String query = "DELETE FROM documents_files WHERE fileName = ?";
+        String query = "DELETE FROM file WHERE filename = ?";
         try (Connection conn = connect();
             PreparedStatement pstmt = conn.prepareStatement(query)) {
             pstmt.setString(1, fileName.getText());
@@ -267,6 +263,7 @@ public class ChapterCardController implements Initializable {
         if (event.getClickCount() == 2) {
             Optional<Node> path = hbox.getChildren().stream()
                     .filter(node -> node instanceof Label)
+                    .skip(1)
                     .findFirst();
             if(path.isPresent()) {
                 Label label = (Label) path.get();

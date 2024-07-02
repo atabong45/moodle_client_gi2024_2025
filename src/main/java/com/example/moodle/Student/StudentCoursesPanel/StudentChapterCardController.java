@@ -158,9 +158,6 @@ public class StudentChapterCardController implements Initializable {
         type.setStyle("-fx-background-color:#fff0; -fx-text-fill:#000000;");
         type.setPrefWidth(120);
 
-        Label deldoc = new Label("❌");
-        deldoc.setStyle("-fx-background-color:#fff0; -fx-text-fill:#ff5e5e;");
-
 
         line.setPrefWidth(FilesVbox.getWidth());
         line.setPrefHeight(HBox.USE_COMPUTED_SIZE);
@@ -175,28 +172,11 @@ public class StudentChapterCardController implements Initializable {
             before.setVisible(false);
         }
 
-        line.getChildren().addAll(before, name, path, region, new Text(readableFileSize), type, deldoc);
+        line.getChildren().addAll(before, name, path, region, new Text(readableFileSize), type);
 
         line.setOnMouseClicked(event -> handleDocClick(line, event));
-        deldoc.setOnMouseClicked(event -> deleteDocFile(name, event));
 
         return line;
-    }
-
-    private void deleteDocFile(Text fileName, MouseEvent event) {
-        String query = "DELETE FROM documents_files WHERE fileName = ?";
-        try (Connection conn = connect();
-            PreparedStatement pstmt = conn.prepareStatement(query)) {
-            pstmt.setString(1, fileName.getText());
-            pstmt.executeUpdate();
-            System.out.println("Document deleted successfully.");
-
-            loadDocumentsFilesFromDatabase();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
     }
 
     private void handleDocClick(HBox hbox, MouseEvent event) {
