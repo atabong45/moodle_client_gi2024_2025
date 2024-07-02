@@ -1,9 +1,13 @@
 package com.example.moodle.Teacher.CoursesPanel;
 
+import com.example.moodle.Entities.Course;
 import com.example.moodle.Entities.Section;
+import com.example.moodle.Entities.User;
 import com.example.moodle.MainDry.Dry;
 import com.example.moodle.Teacher.Cards.SectionCard;
+import com.example.moodle.Teacher.Cards.UserCard;
 import com.example.moodle.Teacher.entity.Chapter;
+import com.example.moodle.api.CourseHelper;
 import com.example.moodle.api.SectionHelper;
 import com.example.moodle.dao.SectionDAO;
 import javafx.event.ActionEvent;
@@ -85,6 +89,7 @@ public class CourseViewPanelController implements Initializable {
     private Text chaptersTitle;
 
     public static List<SectionCard> Chapterslist;
+    public static List<UserCard> UsersList;
 
     private Connection connect() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
@@ -96,6 +101,7 @@ public class CourseViewPanelController implements Initializable {
         courseDescription.setText(currentCourse.getSummary());
 
         Chapterslist = new ArrayList<>();
+        UsersList = new ArrayList<>();
         ChaptersVbox.getChildren().clear();
         hideAll();
     }
@@ -137,9 +143,14 @@ public class CourseViewPanelController implements Initializable {
 
     @FXML
     void handleParticipantsBtn(ActionEvent event) {
-        ChaptersVbox.setVisible(false);
+        ChaptersVbox.setVisible(true);
         selectBtn(leftbtnMenu, ParticipantsBtn);
         ChaptersVbox.getChildren().clear();
+        UsersList.clear();
+        newChapBtn.setVisible(false);
+        newChapBtn.setDisable(true);
+
+        getParticipants();
 
     }
 
@@ -202,6 +213,25 @@ public class CourseViewPanelController implements Initializable {
         for (SectionCard ch : Chapterslist){
             ChaptersVbox.getChildren().add(ch);
         }
+    }
+
+    public  void addUserCard(UserCard userCard) {
+        UsersList.add(userCard);
+        ChaptersVbox.getChildren().clear();
+
+        for (UserCard ch : UsersList){
+            ChaptersVbox.getChildren().add(ch);
+        }
+    }
+
+    public void getParticipants() {
+        CourseHelper courseHelper = new CourseHelper();
+        ArrayList<User> users = courseHelper.getParticipants(currentCourse.getCourseid());
+        for (User user: users) {
+            ChaptersVbox.getChildren().clear();
+            addUserCard(new UserCard(user));
+        }
+
     }
 
     public void loadChaptersFromDatabase() {

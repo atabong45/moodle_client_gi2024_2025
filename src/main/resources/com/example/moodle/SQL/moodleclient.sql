@@ -81,8 +81,7 @@ CREATE TABLE IF NOT EXISTS file (
     updated INT,
     isexternalfile INT,
     repositorytype VARCHAR(255),
-    mimetype VARCHAR(255),
-    FOREIGN KEY (moduleid) REFERENCES module(cmid)
+    mimetype VARCHAR(255)
 );
 
 DROP TABLE IF EXISTS submission;

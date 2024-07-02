@@ -2,13 +2,19 @@ package com.example.moodle.Teacher.AssignmentPanel;
 
 
 import com.example.moodle.Entities.Assignment;
+import com.example.moodle.Entities.Submission;
 import com.example.moodle.Teacher.CoursesPanel.DialogWindows.CreateCourseDialogController;
 import com.example.moodle.Teacher.AssignmentPanel.TAssignmentCardController;
 
 
+import com.example.moodle.api.AssignmentHelper;
+import com.example.moodle.api.SubmissionHelper;
 import com.example.moodle.dao.AssignmentDAO;
+import com.example.moodle.dao.SubmissionDAO;
+import com.example.moodle.moodleclient.Moodleclient;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -29,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class TAssignmentPanelController {
+public class TAssignmentPanelController implements Initializable {
 
     @FXML
     private Label newAssignLabel;
@@ -43,10 +49,13 @@ public class TAssignmentPanelController {
     @FXML
     private GridPane gridpane;
 
-    //@Override
+    @Override
     public void initialize(URL url, ResourceBundle rb) {
-
-        loadAssignments();
+        AssignmentHelper assignmentHelper = new AssignmentHelper();
+        ArrayList<Assignment> assignments =  assignmentHelper.getAssignments(Moodleclient.currentCourse.getCourseid());
+        for (Assignment assignment: assignments) {
+            loadAssignments(assignment.getAssignmentid());
+        }
     }
 
     @FXML
@@ -76,18 +85,19 @@ public class TAssignmentPanelController {
         gridpane.add(assignCard, 0, count+1); // Add the card to the gridpane
         GridPane.setMargin(assignCard, new javafx.geometry.Insets(15, 20, 5, 10));
     }
-    public void loadAssignments() {
-        ArrayList<Assignment> assignments = AssignmentDAO.readAssignments();
-        gridpane.getChildren().clear();
 
-        for (int i = 0; i < assignments.size(); i++) {
+    public void loadAssignments(long assignmentid) {
+        SubmissionHelper submissionHelper = new SubmissionHelper();
+        ArrayList<Submission> submissions = submissionHelper.getAllSubmissions(assignmentid);
+        gridpane.getChildren().clear();
+        for(int i = 0; i < submissions.size(); i++) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/TeacherAssignmentCard.fxml"));
 
                 AnchorPane assignCard = loader.load();
 
                 TAssignmentCardController controller = loader.getController();
-                controller.setAssignDetails(assignments.get(i));
+                controller.setAssignDetails(submissions.get(i));
 
                 gridpane.add(assignCard, 0, i+1);
                 GridPane.setMargin(assignCard, new javafx.geometry.Insets(15, 20, 5, 10));

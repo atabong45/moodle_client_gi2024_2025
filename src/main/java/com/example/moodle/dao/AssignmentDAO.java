@@ -23,22 +23,22 @@ public class AssignmentDAO {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             // Insérer un devoir
-            insertAssignment("Assignment 1", Date.valueOf("2024-06-21"), Date.valueOf("2024-06-30"), "Course 1", "in progress");
+            // insertAssignment("Assignment 1", Date.valueOf("2024-06-21"), Date.valueOf("2024-06-30"), "Course 1", "in progress");
 
             // Lire tous les devoirs
-            readAssignments();
+            // readAssignments();
 
             // Mettre à jour un devoir
-            updateAssignment(1, "Updated Assignment 1", Date.valueOf("2024-06-21"), Date.valueOf("2024-07-01"), "Course 1", "finish");
+            // updateAssignment(1, "Updated Assignment 1", Date.valueOf("2024-06-21"), Date.valueOf("2024-07-01"), "Course 1", "finish");
 
             // Lire tous les devoirs
-            readAssignments();
+            // readAssignments();
 
             // Supprimer un devoir
             deleteAssignment(1);
 
             // Lire tous les devoirs
-            readAssignments();
+            //readAssignments();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -65,12 +65,13 @@ public class AssignmentDAO {
     }
 
 
-    public static ArrayList<com.example.moodle.Entities.Assignment> readAssignments() {
+    public static ArrayList<com.example.moodle.Entities.Assignment> readAssignments(long moduleid) {
         ArrayList<Assignment> assignments = new ArrayList<>();
-        String query = "SELECT * FROM assignment";
+        String query = "SELECT * FROM assignment WHERE moduleid = ?";
         try (Connection connection = DBConnection.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
+             PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setLong(1, moduleid);
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 com.example.moodle.Entities.Assignment assignment = new com.example.moodle.Entities.Assignment();
                 assignment.setAssignmentid(resultSet.getInt("assignmentid"));

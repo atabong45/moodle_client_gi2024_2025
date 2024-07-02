@@ -8,6 +8,7 @@ public class Moodleclient {
     public static client_moodle user;
     public static String serverAddress = "http://localhost/";
     public static String superToken = "f1579cf1651a83cabfcc6791f43df37c";
+    public static String token = "";
 
     public static Course currentCourse;
 }

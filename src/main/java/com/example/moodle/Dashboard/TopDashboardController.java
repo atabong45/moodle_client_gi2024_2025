@@ -17,6 +17,8 @@ import com.example.moodle.Privatefiles.PrivateFile;
 import com.example.moodle.Teacher.entity.Course;
 import com.example.moodle.Teacher.entity.CoursePull;
 import com.example.moodle.moodleclient.Moodleclient;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -38,6 +40,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -123,7 +126,7 @@ public class TopDashboardController implements Initializable{
     private static final String SERVER_ADDRESS = "http://localhost/";
 
 
-    private static final String REQUEST_URL = "http://localhost/login/token.php?username=camrole&password=Camrole-5000&service=SMAS";
+    private static final String REQUEST_URL = "http://localhost/login/token.php?username=admin&password=Admin@123&service=moodle";
 
 
 
@@ -169,10 +172,11 @@ public class TopDashboardController implements Initializable{
 
         @FXML
         void handleSyncBtn(ActionEvent event) {
+            syncImg.setRotate(180);
+            syncImg.setSmooth(true);
             //pull des fichier des cour au quel le user est inscrit
             getCoursesOfUser();
             getdownloadfileAndStoreDB();
-
 
         //action de syncronisatiion du cours
             SyncroniserCour();
@@ -184,13 +188,6 @@ public class TopDashboardController implements Initializable{
                     moveToUserPrivateFiles(draftId);
                 }
             }
-
-
-
-
-
-
-
             // Logic for sync button
             System.out.println("Sync Clicked");
         }
@@ -238,9 +235,6 @@ public class TopDashboardController implements Initializable{
         return privateFiles;
     }
 
-
-
-
     public void SyncroniserCour() {
         readCoursessyncro();
         List<PrivateFile> privatesyncrofiles=readPrivateFilessyncro();
@@ -250,7 +244,6 @@ public class TopDashboardController implements Initializable{
                 moveToUserPrivateFiles(draftId);
             }
         }
-
 
         String moodleUrl = "http://localhost/webservice/rest/server.php";
         String token = "2a8037fc2be456239aba388221cfc1f7";
@@ -291,12 +284,8 @@ public class TopDashboardController implements Initializable{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
         }
-
-
     }
-
 
     public static String executeRequest() throws Exception {
         URL url = new URL(REQUEST_URL);
@@ -333,9 +322,6 @@ public class TopDashboardController implements Initializable{
             return null;
         }
     }
-
-
-
 
     private static String uploadFileToDraftArea(String filePath) {
         File file = new File(filePath);

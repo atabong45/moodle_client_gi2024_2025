@@ -62,8 +62,16 @@ public class HelloController implements Initializable {
         this.tryconnect.setVisible(false);
 
     }
+    private  void checkConnection(String username, String pass, int isTeacher) {
+        UserHelper userHelper = new UserHelper();
+        User user = userHelper.getUser(username, pass, isTeacher);
+        System.out.println(user.getToken());
+        Moodleclient.token = user.getToken();
+
+    }
 
     private boolean checkCredentials(String userName, String pass, int isTeacher) {
+        checkConnection(userName, pass, isTeacher);
         ArrayList<User> users = UsersDAO.getUsers();
         System.out.println(users.size());
         if(users.size() == 0) {
@@ -91,7 +99,9 @@ public class HelloController implements Initializable {
             Moodleclient.user.setId(user.getUserid());
             return true;
         }
+
         return false;
+
     }
 
     @FXML

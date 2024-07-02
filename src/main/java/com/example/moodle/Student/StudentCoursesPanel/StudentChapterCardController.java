@@ -1,11 +1,7 @@
-package com.example.moodle.Teacher.CoursesPanel.ChapterCard;
+package com.example.moodle.Student.StudentCoursesPanel;
 
 import com.example.moodle.Entities.Module;
 import com.example.moodle.Entities.Section;
-import com.example.moodle.Teacher.CoursesPanel.CourseViewPanelController;
-import com.example.moodle.Teacher.CoursesPanel.DialogWindows.CreateChapterDialogController;
-import com.example.moodle.Teacher.entity.Chapter;
-import com.example.moodle.Teacher.entity.DocumentFile;
 import com.example.moodle.api.FileHelper;
 import com.example.moodle.api.ModuleHelper;
 import com.example.moodle.dao.CourseDAO;
@@ -14,25 +10,25 @@ import com.example.moodle.dao.FileDAO;
 import com.example.moodle.dao.ModuleDAO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
-
-import javafx.scene.paint.Color;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +39,7 @@ import static com.example.moodle.DBConnection.*;
 import static com.example.moodle.moodleclient.Moodleclient.currentCourse;
 
 
-public class ChapterCardController implements Initializable {
+public class StudentChapterCardController implements Initializable {
 
     @FXML
     private Label FilesNumber;
@@ -69,66 +65,6 @@ public class ChapterCardController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         NumFiles = 0;
         FilesVbox.getChildren().clear();
-
-    }
-
-    @FXML
-    void addCoursefiles(ActionEvent event) {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Choose files");
-
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("All doc files", "*.pdf", "*.PDF", "*.doc", "*.docx", "*.odt", "*.ppt", "*.pptx", "*.xls", "*.xlsx"),
-                new FileChooser.ExtensionFilter("PDF files", "*.pdf", "*.PDF"),
-                new FileChooser.ExtensionFilter("Word files", "*.doc", "*.docx", "*.odt"),
-                new FileChooser.ExtensionFilter("Presentation files", "*.ppt", "*.pptx"),
-                new FileChooser.ExtensionFilter("Sheets files", "*.xls", "*.xlsx")
-        );
-
-        List<File> selectedFiles = fileChooser.showOpenMultipleDialog(chapterNum.getScene().getWindow());
-
-        if (selectedFiles != null) {
-
-            for (File file : selectedFiles) {
-                String fileName = file.getName();
-                long fileSize = file.length();
-                String readableFileSize = readableFileSize(fileSize);
-                String fileType = getFileType(file);
-                String filePath = file.getAbsolutePath();
-
-                // Insert the file into the database
-                DocumentsFilesDAO.insertDocumentFile(fileName, fileSize, fileType, filePath, (int)section.getCourseid());
-
-                NumFiles++;
-                FilesVbox.getChildren().add(docLine(fileName, readableFileSize, fileType, filePath, false));
-            }
-            FilesNumber.setText(NumFiles+"");
-        }
-    }
-
-    @FXML
-    void deleteChapter(MouseEvent event) {
-
-        try (Connection conn = connect();
-             PreparedStatement statement = conn.prepareStatement("DELETE FROM documents_files WHERE chapterId = ?")) {
-            statement.setLong(1, section.getCourseid());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        try (Connection conn = connect();
-             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM chapters WHERE id = ?")) {
-            pstmt.setLong(1, section.getCourseid());
-            pstmt.executeUpdate();
-            System.out.println("Chapter deleted successfully.");
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        currentCourse.setNumsections(currentCourse.getNumsections() - 1);
-        CourseDAO.updateCourse((int) currentCourse.getCourseid(), currentCourse.getFullname(), currentCourse.getShortname(), currentCourse.getSummary(), currentCourse.getNumsections(), currentCourse.getNumsections());
 
     }
 

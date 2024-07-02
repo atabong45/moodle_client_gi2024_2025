@@ -22,21 +22,22 @@ public class GradeHelper {
             JSONParser parser = new JSONParser();
             JSONObject data = (JSONObject) parser.parse(res);
             JSONObject info = (JSONObject) data.get("lastattempt");
+            if(info != null) {
+                JSONObject submission = (JSONObject) info.get("submission");
+                if((Long) submission.get("id") == submissionid) {
+                    JSONObject feedback = (JSONObject) info.get("feedback");
+                    JSONObject gr = (JSONObject) feedback.get("grade");
+                    grade = new Grade();
+                    grade.setSubmissionid(submissionid);
+                    grade.setGrade((Long) gr.get("grade"));
+                    grade.setGrader((Long) gr.get("grader"));
 
-            JSONObject submission = (JSONObject) info.get("submission");
-            if((Long) submission.get("id") == submissionid) {
-                JSONObject feedback = (JSONObject) info.get("feedback");
-                JSONObject gr = (JSONObject) feedback.get("grade");
-                grade = new Grade();
-                grade.setSubmissionid(submissionid);
-                grade.setGrade((Long) gr.get("grade"));
-                grade.setGrader((Long) gr.get("grader"));
-
-                JSONArray plugins = (JSONArray) feedback.get("plugins");
-                JSONObject plugin = (JSONObject) plugins.get(0);
-                JSONArray editorfields = (JSONArray) plugin.get("editorfields");
-                JSONObject field = (JSONObject) editorfields.get(0);
-                grade.setComment(field.get("text").toString());
+                    JSONArray plugins = (JSONArray) feedback.get("plugins");
+                    JSONObject plugin = (JSONObject) plugins.get(0);
+                    JSONArray editorfields = (JSONArray) plugin.get("editorfields");
+                    JSONObject field = (JSONObject) editorfields.get(0);
+                    grade.setComment(field.get("text").toString());
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

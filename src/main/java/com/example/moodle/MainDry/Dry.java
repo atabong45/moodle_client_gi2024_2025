@@ -1,9 +1,12 @@
 package com.example.moodle.MainDry;
 
+import com.example.moodle.moodleclient.Moodleclient;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.shape.Circle;
 
 import java.io.IOException;
 public class Dry {
@@ -19,6 +22,12 @@ public class Dry {
             AnchorPane topMenu = loader.load();
 
             Label username = (Label) loader.getNamespace().get("username");
+            Circle circle = (Circle) loader.getNamespace().get("connectionIndic");
+            Tooltip tooltip = (Tooltip) loader.getNamespace().get("tipIndic");
+            if(!Moodleclient.token.isEmpty()) {
+                circle.setStyle("-fx-fill: green;");
+                tooltip.setText("Online");
+            }
             //username.setText(moodleclient.Moodleclient.user.getUsername());
 
             root.setTop(topMenu);
@@ -39,6 +48,13 @@ public class Dry {
             AnchorPane topMenu = loader.load();
 
             Label username = (Label) loader.getNamespace().get("username");
+            Circle circle = (Circle) loader.getNamespace().get("connectionIndic");
+            Tooltip tooltip = (Tooltip) loader.getNamespace().get("tipIndic");
+            if(!Moodleclient.token.isEmpty()) {
+                circle.setStyle("-fx-fill: green;");
+                tooltip.setText("Online");
+            }
+
             //username.setText(moodleclient.Moodleclient.user.getUsername());
 
             root.setTop(topMenu);

@@ -1,20 +1,35 @@
 package com.example.moodle.Student.StudentCoursesPanel;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import com.example.moodle.Entities.Course;
 import com.example.moodle.Student.Cards.CourseCard;
 import com.example.moodle.api.CourseHelper;
+import com.example.moodle.dao.CourseDAO;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
-public class StudentCoursesPanelController implements Initializable{
+import static com.example.moodle.DBConnection.*;
+import static com.example.moodle.moodleclient.Moodleclient.user;
 
+public class StudentCoursesPanelController implements Initializable {
+
+    @FXML
+    private Label labelNewCourse;
 
     @FXML
     private Label returnArrow;
@@ -25,31 +40,50 @@ public class StudentCoursesPanelController implements Initializable{
     @FXML
     private GridPane gridpane;
 
+    private static ArrayList<CourseCard> list;
+
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // gridpane.setAlignment(Pos.CENTER);
-        gridpane.setPadding(new Insets(10));
-        gridpane.setHgap(10);
-        gridpane.setVgap(10);
+        list = new ArrayList<>();
+        loadCoursesFromDatabase();
 
-        CourseHelper courseHelper = new CourseHelper();
+    }
 
-        ArrayList<com.example.moodle.Entities.Course> courses = courseHelper.getEnrolledCourses(2);
-//        courses.add(new Course("Architecture des ordinateurs", "Venez découvrir le concept de microcontrôleur et d'électronique", 3));
-//        courses.add(new Course("Réseaux mobiles et intelligents", "Ne voulez-vous pas savoir comment les réseaux de téléponie fonctionnent", 11));
-//        courses.add(new Course("Management", "Apprendre à se gérer et gérer les autres", 5));
-//        courses.add(new Course("Systèmes multi-agents", "La nouvelle évolution de l'IA", 6));
-//        courses.add(new Course("Analyse numérique", "Parce qu'on ne sait pas encore quand on aura besoin de résoudre des équations", 2));
-//        courses.add(new Course("Systèmes formels", "Avant de construire des systèmes experts", 3));
 
-        int count = 0;
-        for(int i = 0; i < (int)Math.ceil((courses.size() / 4.0)); i++) {
-            for(int j = 0; j < 4; j++) {
-                gridpane.add(new CourseCard(courses.get(count)), j, i);
-                count++;
-                if(count == courses.size()) return;
+    public void addCourseCard(CourseCard courseCard) {
+        list.add(courseCard);
+        gridpane.getChildren().clear();
+
+        int col=0, row=0;
+        for (CourseCard card : list) {
+            gridpane.add(card, col, row);
+            col++;
+
+            int columns = 4; //(int) Math.floor(scrollpane.getPrefWidth() / 10);
+            if (col >= columns) {
+                col = 0;
+                row++;
             }
         }
     }
 
+    private void loadCoursesFromDatabase() {
+        ArrayList<com.example.moodle.Entities.Course> courses = CourseDAO.getEnrolledCourses(user.getId());
+        if(courses.size() == 0) {
+            CourseHelper courseHelper = new CourseHelper();
+            courses = courseHelper.getEnrolledCourses(user.getId());
+            for(Course course: courses) {
+                CourseDAO.insertCourse(course);
+            }
+        }
+        for (com.example.moodle.Entities.Course course: courses) {
+            addCourseCard(new CourseCard(course));
+        }
+    }
+
+    public int getCoursesCount() {
+        return list.size();
+    }
 }
+

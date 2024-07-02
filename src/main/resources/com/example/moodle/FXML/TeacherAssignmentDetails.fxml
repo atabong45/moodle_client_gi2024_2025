@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -13,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="527.0" prefWidth="600.0" style="-fx-border-color: BLACK;" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moodle.Teacher.AssignmentPanel.TAssignmentDetailsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="527.0" prefWidth="600.0" style="-fx-border-color: BLACK;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moodle.Teacher.AssignmentPanel.TAssignmentDetailsController">
    <children>
       <Pane prefHeight="49.0" prefWidth="600.0" style="-fx-background-color: ORANGE;">
          <children>
@@ -28,17 +29,23 @@
          <font>
             <Font name="System Bold Italic" size="16.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Label>
       <Label fx:id="deleteLabel" layoutX="496.0" layoutY="66.0" onDragDetected="#handleDelete" text="Delete">
          <font>
             <Font name="System Bold Italic" size="16.0" />
          </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Label>
       <VBox layoutY="105.0" prefHeight="359.0" prefWidth="600.0">
          <children>
             <VBox minHeight="-Infinity" prefHeight="148.0" prefWidth="600.0">
                <children>
-                  <Label minHeight="-Infinity" text="Submission status">
+                  <Label fx:id="lblStatus" minHeight="-Infinity" text="Submission status">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -81,14 +88,14 @@
                         </AnchorPane>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                            <children>
-                              <Label fx:id="DueDate" layoutX="28.0" layoutY="5.0" text="Sunday, 28 November 2021, 12:00 AM" />
+                              <Label fx:id="DueDate" layoutX="28.0" layoutY="5.0" text="Sunday, 28 November 2021, 12:00 AM" visible="false" />
                            </children>
                         </AnchorPane>
                      </children>
                   </GridPane>
                   <HBox minHeight="-Infinity" prefHeight="50.0" prefWidth="600.0">
                      <children>
-                        <Button fx:id="viewSubmissionBtn" mnemonicParsing="false" onAction="#handleViewSubmission" prefHeight="29.0" prefWidth="162.0" style="-fx-background-color: ORANGE;" text="View all submission" textFill="WHITE">
+                        <Button fx:id="viewSubmissionBtn" mnemonicParsing="false" onAction="#handleViewSubmission" prefHeight="29.0" prefWidth="162.0" style="-fx-background-color: ORANGE;" text="View all submission" textFill="WHITE" visible="false">
                            <HBox.margin>
                               <Insets left="130.0" right="40.0" top="7.0" />
                            </HBox.margin>
@@ -103,6 +110,9 @@
                            <font>
                               <Font size="14.0" />
                            </font>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
                         </Button>
                      </children>
                      <VBox.margin>
@@ -128,5 +138,15 @@
             </AnchorPane>
          </children>
       </VBox>
+      <Label layoutX="23.0" layoutY="65.0" prefHeight="20.0" prefWidth="42.0" text="Grade">
+         <font>
+            <Font name="System Bold" size="14.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblGrade" layoutX="73.0" layoutY="67.0">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>
