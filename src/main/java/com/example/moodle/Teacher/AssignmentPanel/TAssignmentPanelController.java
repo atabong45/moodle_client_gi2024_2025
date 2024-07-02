@@ -1,7 +1,7 @@
 package com.example.moodle.Teacher.AssignmentPanel;
 
 
-import com.example.moodle.Teacher.AssignmentPanel.Assignment;
+import com.example.moodle.Entities.Assignment;
 import com.example.moodle.Teacher.CoursesPanel.DialogWindows.CreateCourseDialogController;
 import com.example.moodle.Teacher.AssignmentPanel.TAssignmentCardController;
 
@@ -25,6 +25,7 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -76,7 +77,7 @@ public class TAssignmentPanelController {
         GridPane.setMargin(assignCard, new javafx.geometry.Insets(15, 20, 5, 10));
     }
     public void loadAssignments() {
-        List<Assignment> assignments = AssignmentDAO.readAssignments();
+        ArrayList<Assignment> assignments = AssignmentDAO.readAssignments();
         gridpane.getChildren().clear();
 
         for (int i = 0; i < assignments.size(); i++) {

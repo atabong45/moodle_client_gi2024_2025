@@ -102,9 +102,14 @@ public class CourseViewPanelController implements Initializable {
 
     @FXML
     void handleAssignmentsBtn(ActionEvent event) {
-        ChaptersVbox.setVisible(false);
+        ChaptersVbox.setVisible(true);
         selectBtn(leftbtnMenu, AssignmentsBtn);
         ChaptersVbox.getChildren().clear();
+        Chapterslist.clear();
+        newChapBtn.setVisible(false);
+        newChapBtn.setDisable(true);
+
+        loadAssignmentsFromDataBase();
 
     }
 
@@ -163,7 +168,7 @@ public class CourseViewPanelController implements Initializable {
     @FXML
     void handleReturn(MouseEvent event) {
         try {
-            FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursesPanel_updated.fxml"));
+            FXMLLoader contentLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/CoursePanel_updated.fxml"));
             AnchorPane content = contentLoader.load();
             root.setCenter(content);
         } catch (IOException e) {
@@ -200,6 +205,23 @@ public class CourseViewPanelController implements Initializable {
     }
 
     public void loadChaptersFromDatabase() {
+        ArrayList<Section> sections = SectionDAO.getSections(currentCourse.getCourseid());
+        if(sections.size() == 0) {
+            SectionHelper sectionHelper = new SectionHelper();
+            sections = sectionHelper.getSections(currentCourse.getCourseid());
+            if(sections.size() != 0) {
+                for(Section section: sections) {
+                    SectionDAO.insertSection(section);
+                }
+            }
+        }
+        for (Section section: sections) {
+            ChaptersVbox.getChildren().clear();
+            addChapterCard(new SectionCard(section));
+        }
+    }
+
+    public void loadAssignmentsFromDataBase() {
         ArrayList<Section> sections = SectionDAO.getSections(currentCourse.getCourseid());
         if(sections.size() == 0) {
             SectionHelper sectionHelper = new SectionHelper();

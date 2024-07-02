@@ -76,14 +76,14 @@ public class CreateAssignmentDialogController {
             statut = "";
         }
         try {
-            AssignmentDAO.insertAssignment(assignName, openDate, dueDate, courseName, statut);
+           // AssignmentDAO.insertAssignment(assignName, openDate, dueDate, courseName, statut);
             System.out.println("Assignment created successfully.");
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/TeacherAssignmentCard.fxml"));
             AnchorPane assignCard = loader.load();
 
             TAssignmentCardController assignCardController = loader.getController();
-            assignCardController.setAssignDetails(new Assignment(assignName, courseName, openLocalDate, dueLocalDate));
+           // assignCardController.setAssignDetails(new Assignment(assignName, courseName, openLocalDate, dueLocalDate));
 
             assignPanelController.addAssignCardToPanel(assignCard);
            /* if (assignPanelController != null) {

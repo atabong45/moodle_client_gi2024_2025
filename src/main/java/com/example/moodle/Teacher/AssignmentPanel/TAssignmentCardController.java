@@ -1,6 +1,7 @@
 package com.example.moodle.Teacher.AssignmentPanel;
 
 
+import com.example.moodle.Entities.Assignment;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -39,9 +40,9 @@ public class TAssignmentCardController implements Initializable {
         root.setCenter(detailsPane);
     }
 
-    public void setAssignDetails(com.example.moodle.Teacher.AssignmentPanel.Assignment assign) {
-        this.assignNameLabel.setText(assign.getAssignName());
-        this.courseNameLabel.setText(assign.getCourseName());
+    public void setAssignDetails(Assignment assign) {
+        this.assignNameLabel.setText(assign.getAssignmentname());
+        this.courseNameLabel.setText(assign.getModuleid() + "");
     }
 
 

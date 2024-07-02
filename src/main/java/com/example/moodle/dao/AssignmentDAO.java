@@ -2,7 +2,7 @@ package com.example.moodle.dao;
 
 
 import com.example.moodle.DBConnection;
-import com.example.moodle.Teacher.AssignmentPanel.Assignment;
+import com.example.moodle.Entities.Assignment;
 
 
 import java.sql.*;
@@ -46,15 +46,16 @@ public class AssignmentDAO {
     }
 
     // Méthode pour insérer un devoir
-    public static void insertAssignment(String assignmentName, Date createdDate, Date limitedDate, String courseName, String statut) {
-        String query = "INSERT INTO assignments (assignmentName, createdDate, limitedDate, courseName, statut) VALUES (?, ?, ?, ?, ?)";
+    public static void insertAssignment(com.example.moodle.Entities.Assignment assignment) {
+        String query = "INSERT INTO assignment (assignmentid, moduleid, assignmentname, created, duedate) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DriverManager.getConnection(JDBC_URL, JDBC_USERNAME, JDBC_PASSWORD);
 
              PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, assignmentName);
-            statement.setDate(2, createdDate);
-            statement.setDate(3, limitedDate);
-            statement.setString(4, courseName);
+            statement.setLong(1, assignment.getAssignmentid());
+            statement.setLong(2, assignment.getModuleid());
+            statement.setString(3, assignment.getAssignmentname());
+            statement.setLong(4, assignment.getCreated());
+            statement.setLong(5, assignment.getDuedate());
             statement.executeUpdate();
             System.out.println("Assignment inserted successfully");
         } catch (SQLException e) {
@@ -64,20 +65,19 @@ public class AssignmentDAO {
     }
 
 
-    public static List<Assignment> readAssignments() {
-        List<Assignment> assignments = new ArrayList<>();
-        String query = "SELECT * FROM assignments";
+    public static ArrayList<com.example.moodle.Entities.Assignment> readAssignments() {
+        ArrayList<Assignment> assignments = new ArrayList<>();
+        String query = "SELECT * FROM assignment";
         try (Connection connection = DBConnection.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
             while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String assignmentName = resultSet.getString("assignmentName");
-                Date createdDate = resultSet.getDate("createdDate");
-                Date limitedDate = resultSet.getDate("limitedDate");
-                String courseName = resultSet.getString("courseName");
-
-                Assignment assignment = new Assignment(id, assignmentName, createdDate, limitedDate, courseName);
+                com.example.moodle.Entities.Assignment assignment = new com.example.moodle.Entities.Assignment();
+                assignment.setAssignmentid(resultSet.getInt("assignmentid"));
+                assignment.setAssignmentname(resultSet.getString("assignmentname"));
+                assignment.setCreated(resultSet.getLong("created"));
+                assignment.setDuedate(resultSet.getLong("duedate"));
+                assignment.setModuleid(resultSet.getLong("moduleid"));
                 assignments.add(assignment);
             }
         } catch (SQLException e) {

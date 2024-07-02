@@ -132,7 +132,6 @@ public class ChapterCardController implements Initializable {
 
     }
 
-
     private void loadDocumentsFilesFromDatabase() {
         ArrayList<com.example.moodle.Entities.File> files = new ArrayList<>();
         ArrayList<Module> modules = ModuleDAO.getModules(section.getSectionid());
@@ -167,29 +166,6 @@ public class ChapterCardController implements Initializable {
 
             }
         }
-
-
-//        String query = "SELECT * FROM documents_files WHERE chapterId = '" + section.getCourseid() + "'";
-//        try (Connection conn = connect();
-//             PreparedStatement pstmt = conn.prepareStatement(query);
-//             ResultSet rs = pstmt.executeQuery()) {
-//            while (rs.next()) {
-//                DocumentFile doc = new DocumentFile(
-//                    rs.getInt("id"),
-//                    rs.getString("fileName"),
-//                    rs.getLong("fileSize"),
-//                    rs.getString("fileType"),
-//                    rs.getString("filePath"),
-//                    rs.getInt("chapterId")
-//                );
-//
-//                NumFiles++;
-//                FilesNumber.setText(NumFiles+"");
-//                FilesVbox.getChildren().add(docLine(doc.getFileName(), readableFileSize(doc.getFileSize()), doc.getFileType(), doc.getFilePath()));
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
     }
 
     private String getFileType(File file) {
