@@ -170,7 +170,7 @@ public class TopDashboardController implements Initializable{
             getCoursesOfUser();
             getdownloadfileAndStoreDB();
 
-        //action de syncronisatiion du cours
+            //action de syncronisatiion du cours
             //SyncroniserCour();
             //action de syncronisation des fichier privés
             List<PrivateFile> privatesyncrofiles = readPrivateFilessyncro();
