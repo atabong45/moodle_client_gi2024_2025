@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
@@ -11,7 +12,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxWidth="1.7976931348623157E308" onMouseClicked="#handleAssigment" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moodle.Student.studentAssigmentPanel.studentAssigmentCardController">
+<AnchorPane maxWidth="1.7976931348623157E308" onMouseClicked="#handleAssigment" prefHeight="71.0" prefWidth="285.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moodle.Student.studentAssigmentPanel.studentAssigmentCardController">
    <children>
         <VBox fx:id="assigment" maxWidth="1.7976931348623157E308" style="-fx-background-color: fff; -fx-border-radius: 10; -fx-background-radius: 10;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
             <children>
@@ -25,16 +26,11 @@
                         <Insets left="15.0" right="10.0" top="3.0" />
                      </HBox.margin>
                   </ImageView>
-                        <Label fx:id="courseName" text="Génie Logiciel" textFill="#383838">
+                        <Label fx:id="courseName" text="Génie Logiciel / " textFill="#383838">
                             <font>
                                 <Font name="System Bold" size="17.0" />
                             </font>
                         </Label>
-                  <Label text="  /  ">
-                     <font>
-                        <Font name="System Bold" size="17.0" />
-                     </font>
-                  </Label>
                   <Label fx:id="AssigmentName" text="Devoir 1">
                      <font>
                         <Font name="System Bold" size="17.0" />
@@ -75,4 +71,7 @@
             </effect>
         </VBox>
    </children>
+   <cursor>
+      <Cursor fx:constant="HAND" />
+   </cursor>
 </AnchorPane>

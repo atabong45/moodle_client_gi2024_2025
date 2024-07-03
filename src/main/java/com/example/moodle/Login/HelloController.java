@@ -71,12 +71,15 @@ public class HelloController implements Initializable {
         this.tryconnect.setVisible(false);
 
     }
-    private  void checkConnection(String username, String pass, int isTeacher) {
+    private boolean checkConnection(String username, String pass, int isTeacher) {
         UserHelper userHelper = new UserHelper();
         User user = userHelper.getUser(username, pass, isTeacher);
+        if(user == null) {
+            return false;
+        }
         System.out.println(user.getToken());
         Moodleclient.token = user.getToken();
-
+        return true;
     }
 
     private boolean checkCredentials(String userName, String pass, int isTeacher) {

@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="241.0" prefWidth="428.0" style="-fx-background-radius: 10; -fx-background-color: fff; -fx-border-color: #525252; -fx-border-radius: 10; -fx-border-width: 2;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moodle.Teacher.CoursesPanel.DialogWindows.EditCourseDialogController">
+<AnchorPane prefHeight="241.0" prefWidth="428.0" style="-fx-background-radius: 10; -fx-background-color: fff; -fx-border-color: #525252; -fx-border-radius: 10; -fx-border-width: 2;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moodle.Teacher.CoursesPanel.DialogWindows.EditCourseDialogController">
    <opaqueInsets>
       <Insets />
    </opaqueInsets>
@@ -73,6 +73,9 @@
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </Button>
                   <Button cancelButton="true" mnemonicParsing="false" onAction="#handleCancelAction" style="-fx-background-color: e2e2e2; -fx-border-radius: 10;" text="Cancel">
                      <font>
@@ -81,6 +84,9 @@
                      <HBox.margin>
                         <Insets left="10.0" />
                      </HBox.margin>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
                   </Button>
                </children>
             </HBox>

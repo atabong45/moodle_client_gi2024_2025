@@ -83,7 +83,7 @@ public class SubmissionHelper {
     }
 
     public boolean saveSubmission(long assignmentid, long itemid) {
-        String urlStr = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.superToken + "&wsfunction=" + SAVE_SUBMISSION + "&moodlewsrestformat=json&assignmentid=" + assignmentid +
+        String urlStr = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.token + "&wsfunction=" + SAVE_SUBMISSION + "&moodlewsrestformat=json&assignmentid=" + assignmentid +
                 "&plugindata[files_filemanager]=" + itemid;
         try {
              String res = RequestHelper.formRequest(urlStr);

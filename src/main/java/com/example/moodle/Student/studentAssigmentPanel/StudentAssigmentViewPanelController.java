@@ -1,8 +1,11 @@
 package com.example.moodle.Student.studentAssigmentPanel;
 
+import com.example.moodle.Dashboard.TopDashboardController;
+import com.example.moodle.Entities.Assignment;
 import com.example.moodle.Login.HelloController;
 import com.example.moodle.MainDry.Dry;
 import com.example.moodle.Student.StudentPrivateFiles.filesdetails;
+import com.example.moodle.api.SubmissionHelper;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -39,6 +42,16 @@ public class StudentAssigmentViewPanelController {
     @FXML
     private ScrollPane scrollpane;
 
+    private long assignmentid;
+
+    public long getAssignmentid() {
+        return assignmentid;
+    }
+
+    public void setAssignmentid(long assignmentid) {
+        this.assignmentid = assignmentid;
+    }
+
     @FXML
     private void initialize() {
         fileListView.setOnMouseClicked(event -> handleFileClick(event));
@@ -48,9 +61,9 @@ public class StudentAssigmentViewPanelController {
     void handleNewFile(MouseEvent event) {
         FileChooser fileChooser = new FileChooser();
 
-        FileChooser.ExtensionFilter videoFilter = new FileChooser.ExtensionFilter("Fichiers Vidéo", ".mp4", ".avi", "*.mkv");
-        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Fichiers Image", ".png", ".jpg", ".jpeg", ".gif");
-        FileChooser.ExtensionFilter documentFilter = new FileChooser.ExtensionFilter("Fichiers Document", ".pdf", ".doc", ".docx", ".xls", "*.xlsx");
+        FileChooser.ExtensionFilter videoFilter = new FileChooser.ExtensionFilter("Vidéos", ".mp4", ".avi", "*.mkv");
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Images", ".png", ".jpg", ".jpeg", ".gif");
+        FileChooser.ExtensionFilter documentFilter = new FileChooser.ExtensionFilter("Documents", "*.pdf", ".doc", ".docx", ".xls", "*.xlsx");
 
         fileChooser.getExtensionFilters().addAll(videoFilter, imageFilter, documentFilter);
 
@@ -63,6 +76,8 @@ public class StudentAssigmentViewPanelController {
                 String filePath = file.getAbsolutePath();
                 String fileType = determineFileType(fileChooser, file);
 
+                SubmissionHelper submissionHelper = new SubmissionHelper();
+                submissionHelper.saveSubmission(assignmentid, TopDashboardController.uploadFileToDraftAreaB(filePath));
                 assigmentdetails fileItem = new assigmentdetails(fileName, fileSize, fileType, filePath);
                 fileListView.getItems().add(fileItem);
             }

@@ -51,6 +51,7 @@ public class TAssignmentDetailsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        lblGrade.setVisible(false);
     }
 
     public void handleModify() {

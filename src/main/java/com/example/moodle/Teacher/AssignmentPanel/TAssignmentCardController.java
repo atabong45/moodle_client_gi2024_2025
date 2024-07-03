@@ -19,8 +19,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
-import static com.example.moodle.moodleclient.Moodleclient.currentCourse;
-import static com.example.moodle.moodleclient.Moodleclient.root;
+import static com.example.moodle.moodleclient.Moodleclient.*;
 
 public class TAssignmentCardController implements Initializable {
     @FXML

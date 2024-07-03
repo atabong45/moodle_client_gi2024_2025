@@ -2,8 +2,10 @@ package com.example.moodle.Student.studentAssigmentPanel;
 
 import com.example.moodle.Student.Cards.AssigmentCard;
 
-import com.example.moodle.Student.StudentCoursesPanel.Assigment;
+import com.example.moodle.Entities.Assignment;
 
+import com.example.moodle.api.AssignmentHelper;
+import com.example.moodle.moodleclient.Moodleclient;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -39,13 +41,14 @@ public class studentAssigmentController {
         inProgress.setVisible(false);
         Finished.setVisible(false);
 
-        ArrayList<Assigment> assigments = new ArrayList<>();
-        assigments.add(new Assigment("Architecture des ordinateurs","Devoir 1", "inProgress",new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
-        assigments.add(new Assigment("Réseaux mobiles et intelligents", "Devoir 1","inProgress", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
-        assigments.add(new Assigment("Management", "Devoir 1","inProgress", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
-        assigments.add(new Assigment("Systèmes multi-agents", "Devoir 1","finished", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
-        assigments.add(new Assigment("Analyse numérique", "Devoir 1","finished", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
-        assigments.add(new Assigment("Systèmes formels", "Devoir 1","finished", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
+        AssignmentHelper assignmentHelper = new AssignmentHelper();
+        ArrayList<Assignment> assigments = assignmentHelper.getAssignments(Moodleclient.currentCourse.getCourseid());
+//        assigments.add(new Assigment("Architecture des ordinateurs","Devoir 1", "inProgress",new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
+//        assigments.add(new Assigment("Réseaux mobiles et intelligents", "Devoir 1","inProgress", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
+//        assigments.add(new Assigment("Management", "Devoir 1","inProgress", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
+//        assigments.add(new Assigment("Systèmes multi-agents", "Devoir 1","finished", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
+//        assigments.add(new Assigment("Analyse numérique", "Devoir 1","finished", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
+//        assigments.add(new Assigment("Systèmes formels", "Devoir 1","finished", new Date(2024, 6, 26, 12, 30, 0), new Date(2024, 4, 12, 12, 30, 0)));
 
         int count = 0;
         for(int i = 0; i < (int)Math.ceil(assigments.size()); i++) {

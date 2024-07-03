@@ -339,7 +339,7 @@ public class TopDashboardController implements Initializable{
         }
     }
 
-    private static String uploadFileToDraftArea(String filePath) {
+    public String uploadFileToDraftArea(String filePath) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
             System.err.println("Cannot access file: " + filePath);
@@ -376,7 +376,45 @@ public class TopDashboardController implements Initializable{
         return null;
     }
 
-    private static void moveToUserPrivateFiles(String draftId) {
+    public static long uploadFileToDraftAreaB(String filePath) {
+        File file = new File(filePath);
+        if (!file.exists() || !file.canRead()) {
+            System.err.println("Cannot access file: " + filePath);
+            return -1;
+        }
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + token);
+            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+            builder.addBinaryBody("file_1", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
+            HttpEntity multipart = builder.build();
+            uploadFile.setEntity(multipart);
+
+            HttpResponse response = httpClient.execute(uploadFile);
+            HttpEntity responseEntity = response.getEntity();
+            String responseString = EntityUtils.toString(responseEntity);
+
+            System.out.println("Upload response: " + responseString);
+
+            if (responseString.startsWith("[")) {
+                JSONArray jsonResponse = new JSONArray(responseString);
+                JSONObject jsonObject = jsonResponse.getJSONObject(0);
+                return jsonObject.getLong("itemid");
+            } else if (responseString.startsWith("{")) {
+                JSONObject jsonResponse = new JSONObject(responseString);
+                return jsonResponse.getLong("itemid");
+            } else {
+                System.err.println("Unexpected response format: " + responseString);
+                return -1;
+            }
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+
+    public static void moveToUserPrivateFiles(String draftId) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost post = new HttpPost(SERVER_ADDRESS + "webservice/rest/server.php?moodlewsrestformat=json");
             List<NameValuePair> urlParameters = new ArrayList<>();
