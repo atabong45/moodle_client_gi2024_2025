@@ -35,7 +35,7 @@ public class TAssignmentCardController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        courseNameLabel.setStyle("-fx-text-fill: black;");
     }
 
     public void handleDetails() throws IOException {

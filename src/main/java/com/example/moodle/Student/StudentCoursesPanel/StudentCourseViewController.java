@@ -3,8 +3,8 @@ package com.example.moodle.Student.StudentCoursesPanel;
 import com.example.moodle.Entities.User;
 import com.example.moodle.MainDry.Dry;
 import com.example.moodle.Entities.Section;
-import com.example.moodle.Teacher.Cards.SectionCard;
-import com.example.moodle.Teacher.Cards.UserCard;
+import com.example.moodle.Student.Cards.SectionCard;
+import com.example.moodle.Student.Cards.UserCard;
 import com.example.moodle.api.CourseHelper;
 import com.example.moodle.api.SectionHelper;
 import com.example.moodle.dao.SectionDAO;
@@ -92,6 +92,7 @@ public class StudentCourseViewController implements Initializable {
     @FXML
     void handleChaptersBtn(ActionEvent event) {
         selectBtn(leftbtnMenu, ChaptersBtn);
+        courseDescription.setVisible(false);
         chaptersTitle.setVisible(true);
         ChaptersVbox.setVisible(true);
         ChaptersVbox.getChildren().clear();
@@ -105,6 +106,8 @@ public class StudentCourseViewController implements Initializable {
     void handleParticipantsBtn(ActionEvent event) {
         ChaptersVbox.setVisible(true);
         selectBtn(leftbtnMenu, ParticipantsBtn);
+        courseDescription.setVisible(false);
+        chaptersTitle.setVisible(false);
         ChaptersVbox.getChildren().clear();
         UsersList.clear();
 

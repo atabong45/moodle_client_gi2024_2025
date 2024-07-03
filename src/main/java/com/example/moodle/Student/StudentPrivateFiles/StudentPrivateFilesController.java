@@ -56,9 +56,9 @@ public class StudentPrivateFilesController {
     void handleNewFile(MouseEvent event) {
         FileChooser fileChooser = new FileChooser();
 
-        FileChooser.ExtensionFilter videoFilter = new FileChooser.ExtensionFilter("Fichiers Vidéo", ".mp4", ".avi", "*.mkv");
-        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Fichiers Image", ".png", ".jpg", ".jpeg", ".gif");
-        FileChooser.ExtensionFilter documentFilter = new FileChooser.ExtensionFilter("Fichiers Document", ".pdf", ".doc", ".docx", ".xls", "*.xlsx");
+        FileChooser.ExtensionFilter videoFilter = new FileChooser.ExtensionFilter("Vidéos", ".mp4", ".avi", "*.mkv");
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter("Images", ".png", ".jpg", ".jpeg", ".gif");
+        FileChooser.ExtensionFilter documentFilter = new FileChooser.ExtensionFilter("Documents", "*.pdf", ".doc", ".docx", ".xls", "*.xlsx");
 
         fileChooser.getExtensionFilters().addAll(videoFilter, imageFilter, documentFilter);
 

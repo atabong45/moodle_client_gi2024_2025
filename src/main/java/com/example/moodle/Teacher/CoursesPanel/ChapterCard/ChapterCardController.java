@@ -210,7 +210,7 @@ public class ChapterCardController implements Initializable {
         Region region = new Region();
         Label path = new Label(filePath);
         Label before = new Label("\uD83D\uDCDD");
-        before.setStyle("-fx-background-color:#fff0; -fx-text-fill:#ff5e5e;");
+        before.setStyle("-fx-background-color:#e2e2e2; -fx-text-fill:#303030; -fx-border-radius: 50;");
 
         Text name = new Text(fileName);
 
@@ -232,7 +232,7 @@ public class ChapterCardController implements Initializable {
         path.setVisible(false);
 
         if(!isAssignment) {
-            before.setVisible(false);
+            before.setText("📕");
         }
 
         line.getChildren().addAll(before, name, path, region, new Text(readableFileSize), type, deldoc);

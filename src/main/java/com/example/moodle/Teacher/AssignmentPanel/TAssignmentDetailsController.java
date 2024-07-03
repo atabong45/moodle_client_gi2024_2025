@@ -48,7 +48,7 @@ public class TAssignmentDetailsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        lblGrade.setStyle("-fx-text-fill: orange;");
     }
 
     public void handleModify() {
