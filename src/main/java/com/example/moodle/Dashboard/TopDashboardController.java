@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -46,6 +47,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -60,6 +62,7 @@ import org.json.JSONObject;
 
 import static com.example.moodle.DBConnection.*;
 import static com.example.moodle.HelloApplication.stage;
+import static com.example.moodle.Login.HelloController.usertoken;
 import static com.example.moodle.moodleclient.client_moodle.username;
 import static com.example.moodle.moodleclient.Moodleclient.superToken;
 import static com.example.moodle.moodleclient.Moodleclient.user;
@@ -175,8 +178,9 @@ public class TopDashboardController implements Initializable{
             syncImg.setRotate(180);
             syncImg.setSmooth(true);
             //pull des fichier des cour au quel le user est inscrit
-            getCoursesOfUser();
-            getdownloadfileAndStoreDB();
+            //getCoursesOfUser();
+            //getdownloadfileAndStoreDB();
+            //pull_private_files();
 
         //action de syncronisatiion du cours
             //SyncroniserCour();
@@ -246,7 +250,7 @@ public class TopDashboardController implements Initializable{
         }
 
         String moodleUrl = "http://localhost/webservice/rest/server.php";
-        String token = "2a8037fc2be456239aba388221cfc1f7";
+
         String categoryid = "1";
 
         for (Course cour : courList) {
@@ -258,7 +262,7 @@ public class TopDashboardController implements Initializable{
                     conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                     conn.setDoOutput(true);
 
-                    String params = "moodlewsrestformat=json&wsfunction=core_course_create_courses&wstoken=" + token +
+                    String params = "moodlewsrestformat=json&wsfunction=core_course_create_courses&wstoken=" + superToken +
                             "&courses[0][fullname]=" + cour.getCourseName() +
                             "&courses[0][shortname]=" + cour.getCourseAbr() +
                             "&courses[0][categoryid]=" + categoryid +
@@ -531,17 +535,38 @@ public class TopDashboardController implements Initializable{
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
-        String filePath = "D:\\downloadedmoddlefiles\\" + fileName;  // Define your file path here
+        // Check the response code
+        int responseCode = conn.getResponseCode();
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            throw new Exception("Failed to connect, HTTP response code: " + responseCode);
+        }
+
+        String filePath = "D:\\downloadedmoddlefiles\\" + sanitizeFileName(fileName);
         try (InputStream in = conn.getInputStream();
              FileOutputStream out = new FileOutputStream(filePath)) {
+
             byte[] buffer = new byte[4096];
             int bytesRead;
+            long totalBytesRead = 0;
             while ((bytesRead = in.read(buffer)) != -1) {
                 out.write(buffer, 0, bytesRead);
+                totalBytesRead += bytesRead;
             }
+
+            // Log the total bytes read for debugging
+            System.out.println("Total bytes read: " + totalBytesRead);
+
+            if (totalBytesRead == 0) {
+                throw new Exception("No data was downloaded, file might be corrupted.");
+            }
+        } finally {
+            conn.disconnect();
         }
-        conn.disconnect();
         return filePath;
+    }
+
+    private static String sanitizeFileName(String fileName) {
+        return fileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
     }
 
     private static void storeFilePathInDatabase(int courseId, String topicName, String fileName, String filePath) throws SQLException {
@@ -595,4 +620,104 @@ public class TopDashboardController implements Initializable{
     }
 
 
+
+
+    //pull des private files
+
+    private static String fetchFilesFromMoodle() {
+        String requestUrl="";
+        try { requestUrl = SERVER_ADDRESS + "webservice/rest/server.php?wstoken=" + usertoken +
+                "&moodlewsrestformat=json&wsfunction=core_files_get_files&contextid=-1&filename=&filepath=/&itemid=0&filearea=private&component=user&contextlevel=user&instanceid="+getUserId(user.getUsername());} catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(requestUrl);
+            CloseableHttpResponse response = httpClient.execute(request);
+            HttpEntity entity = response.getEntity();
+            return entity != null ? EntityUtils.toString(entity) : null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
+    public static void extractUrlsAndDownloadFiles(String jsonResponse) {
+        try {
+            JSONObject json = new JSONObject(jsonResponse);
+            JSONArray files = json.getJSONArray("files");
+
+            for (int i = 0; i < files.length(); i++) {
+                JSONObject file = files.getJSONObject(i);
+                String fileName = file.getString("filename");
+                String fileUrl = file.getString("url");
+
+                // Download and save the file
+                downloadFileprivate(fileUrl, "D:\\Cours\\Info 4\\4e Annee GI\\Semestre 1\\IHM\\moodlefilesdownloadedd\\" + fileName);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    private static void downloadFileprivate(String fileURL, String savePath) {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+        HttpURLConnection httpConn = null;
+
+        try {
+            URL url = new URL(fileURL);
+            httpConn = (HttpURLConnection) url.openConnection();
+            httpConn.setRequestMethod("GET");
+            httpConn.setDoOutput(true); // Ensures the URL connection is writable for large file handling
+
+            int responseCode = httpConn.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                inputStream = httpConn.getInputStream();
+                outputStream = new FileOutputStream(savePath);
+
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+
+                System.out.println("File downloaded: " + savePath);
+            } else {
+                System.err.println("No file to download. Server replied HTTP code: " + responseCode);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (httpConn != null) {
+                    httpConn.disconnect();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+
+
+    public void pull_private_files(){
+        String jsonResponse = fetchFilesFromMoodle();
+        if (jsonResponse != null) {
+            extractUrlsAndDownloadFiles(jsonResponse);
+        } else {
+            System.err.println("Failed to fetch files from Moodle.");
+        }
+    }
+
+}
