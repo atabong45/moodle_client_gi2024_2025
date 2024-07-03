@@ -17,6 +17,7 @@ import com.example.moodle.Privatefiles.PrivateFile;
 import com.example.moodle.Entities.Course;
 import com.example.moodle.Teacher.entity.CoursePull;
 import com.example.moodle.api.CourseHelper;
+import com.example.moodle.api.RequestHelper;
 import com.example.moodle.dao.CourseDAO;
 import com.example.moodle.moodleclient.Moodleclient;
 import javafx.animation.KeyFrame;
@@ -59,6 +60,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import static com.example.moodle.DBConnection.*;
 import static com.example.moodle.HelloApplication.stage;
@@ -423,43 +425,115 @@ public class TopDashboardController implements Initializable{
     }
 
     public void getdownloadfileAndStoreDB() {
-
+        final String COURSE_CONTENT = "core_course_get_contents";
+        final String GET_ASSIGNMENTS = "mod_assign_get_assignments";
         try {
 
             // For each course, retrieve and process course contents
             for (Course course : userCourses) {
-                JSONArray courseContents = getCourseContents(course.getCourseid());
+                com.example.moodle.Entities.File file = null;
+                String urlStr = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.superToken + "&wsfunction=" + COURSE_CONTENT + "&moodlewsrestformat=json&courseid=" + course.getCourseid();
+                String urlStr2 = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.superToken + "&wsfunction=" + GET_ASSIGNMENTS + "&moodlewsrestformat=json&courseids[0]=" + course.getCourseid();
+                String res = RequestHelper.formRequest(urlStr);
+                JSONParser parser = new JSONParser();
+                org.json.simple.JSONArray data = (org.json.simple.JSONArray) parser.parse(res);
+                for(int j = 0; j < data.size(); j++) {
+                    org.json.simple.JSONObject section = (org.json.simple.JSONObject) data.get(j);
+                    org.json.simple.JSONArray jsonArray = (org.json.simple.JSONArray) section.get("modules");
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        org.json.simple.JSONObject module = (org.json.simple.JSONObject) jsonArray.get(i);
+                        if ((Long) module.get("downloadcontent") == 1) {
+                            file = new com.example.moodle.Entities.File();
+                            org.json.simple.JSONArray contents = (org.json.simple.JSONArray) module.get("contents");
+                            if (contents != null) {
+                                for(int k = 0; k < contents.size(); k++) {
+                                    org.json.simple.JSONObject content = (org.json.simple.JSONObject) contents.get(k);
 
-                for (int i = 0; i < courseContents.length(); i++) {
-                    JSONObject topic = courseContents.getJSONObject(i);
-                    String topicName = topic.getString("name");
-                    System.out.println("Topic: " + topicName);
-
-                    JSONArray modules = topic.getJSONArray("modules");
-                    for (int j = 0; j < modules.length(); j++) {
-                        JSONObject module = modules.getJSONObject(j);
-                        if (module.has("contents")) {
-                            JSONArray contents = module.getJSONArray("contents");
-
-                            for (int k = 0; k < contents.length(); k++) {
-                                JSONObject content = contents.getJSONObject(k);
-                                String fileName = content.getString("filename");
-                                String fileUrl = content.getString("fileurl");
-
-                                // Download the file
-                                String filePath = downloadFile(fileUrl, fileName);
+                                    file.setFilename(content.get("filename").toString());
+                                    file.setModuleid((Long) module.get("id"));
+                                    file.setFilepath(content.get("filepath").toString());
+                                    file.setFilesize((Long) content.get("filesize"));
+                                    file.setFileurl(content.get("fileurl").toString());
+                                    file.setCreated((Long) content.get("timecreated"));
+                                    file.setUpdated((Long) content.get("timemodified"));
+                                    file.setRepositorytype("");
+                                    file.setMimetype(content.get("mimetype").toString());
+                                }
+                                String filePath = downloadFile(file.getFileurl(), file.getFilename());
 
                                 // Store the file path in the database
-                                storeFilePathInDatabase((int) course.getCourseid(), topicName, fileName, filePath);
+                                storeFilePathInDatabase((int) course.getCourseid(), file.getModuleid() + "", file.getFilename(), filePath);
 
-                                System.out.println("    File: " + fileName + " downloaded to " + filePath);
+                                System.out.println("    File: " + file.getFilename() + " downloaded to " + filePath);
+
+                            } else if (module.get("modname").toString().equals("assign")) {
+                                try {
+                                    String res2 = RequestHelper.formRequest(urlStr2);
+                                    JSONParser parser2 = new JSONParser();
+                                    org.json.simple.JSONObject data2 = (org.json.simple.JSONObject) parser2.parse(res2);
+                                    org.json.simple.JSONArray courses = (org.json.simple.JSONArray) data2.get("courses");
+                                    org.json.simple.JSONObject course2 = (org.json.simple.JSONObject) courses.get(0);
+                                    org.json.simple.JSONArray array = (org.json.simple.JSONArray) course2.get("assignments");
+                                    for (int k = 0; k < array.size(); k++) {
+                                        org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) array.get(k);
+                                        file = new com.example.moodle.Entities.File();
+                                        org.json.simple.JSONArray filesTab = (org.json.simple.JSONArray) jsonObject.get("introattachments");
+                                        org.json.simple.JSONObject fileObject = (org.json.simple.JSONObject) filesTab.get(0);
+                                        file.setFilename(fileObject.get("filename").toString());
+                                        file.setModuleid((Long) jsonObject.get("cmid"));
+                                        file.setFilepath(fileObject.get("filepath").toString());
+                                        file.setFilesize((Long) fileObject.get("filesize"));
+                                        file.setFileurl(fileObject.get("fileurl").toString());
+                                        file.setUpdated((Long) fileObject.get("timemodified"));
+                                        file.setMimetype(fileObject.get("mimetype").toString());
+                                    }
+                                    // Download the file
+                                String filePath = downloadFile(file.getFileurl(), file.getFilename());
+
+                                // Store the file path in the database
+                                storeFilePathInDatabase((int) course.getCourseid(), file.getModuleid() + "", file.getFilename(), filePath);
+
+                                System.out.println("    File: " + file.getFilename() + " downloaded to " + filePath);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
                 }
             }
-
-        }catch(Exception e)
+//                JSONArray courseContents = getCourseContents(course.getCourseid());
+//
+//                for (int i = 0; i < courseContents.length(); i++) {
+//                    JSONObject topic = courseContents.getJSONObject(i);
+//                    String topicName = topic.getString("name");
+//                    System.out.println("Topic: " + topicName);
+//
+//                    JSONArray modules = topic.getJSONArray("modules");
+//                    for (int j = 0; j < modules.length(); j++) {
+//                        JSONObject module = modules.getJSONObject(j);
+//                        if (module.has("contents")) {
+//                            JSONArray contents = module.getJSONArray("contents");
+//
+//                            for (int k = 0; k < contents.length(); k++) {
+//                                JSONObject content = contents.getJSONObject(k);
+//                                String fileName = content.getString("filename");
+//                                String fileUrl = content.getString("fileurl");
+//
+//                                // Download the file
+//                                String filePath = downloadFile(fileUrl, fileName);
+//
+//                                // Store the file path in the database
+//                                storeFilePathInDatabase((int) course.getCourseid(), topicName, fileName, filePath);
+//
+//                                System.out.println("    File: " + fileName + " downloaded to " + filePath);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+        } catch(Exception e)
         {
             e.printStackTrace();
         }

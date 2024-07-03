@@ -89,7 +89,7 @@ public class ChapterCardController implements Initializable {
                 String fileName = file.getName();
                 long fileSize = file.length();
                 String readableFileSize = readableFileSize(fileSize);
-                String fileType = getFileType(file);
+                String fileType = getFileType(file.getName());
                 String filePath = file.getAbsolutePath();
 
                 // Insert the file into the database
@@ -158,9 +158,9 @@ public class ChapterCardController implements Initializable {
                     NumFiles++;
                     FilesNumber.setText(NumFiles+"");
                     if (module.getModname().equals("assign")) {
-                        FilesVbox.getChildren().add(docLine(file.getFilename(), readableFileSize(file.getFilesize()), "PDF", file.getFilepath(), true));
+                        FilesVbox.getChildren().add(docLine(file.getFilename(), readableFileSize(file.getFilesize()), getFileType(file.getFilename()), file.getFilepath(), true));
                     } else {
-                        FilesVbox.getChildren().add(docLine(file.getFilename(), readableFileSize(file.getFilesize()), "PDF", file.getFilepath(), false));
+                        FilesVbox.getChildren().add(docLine(file.getFilename(), readableFileSize(file.getFilesize()), getFileType(file.getFilename()), file.getFilepath(), false));
                     }
                 }
 
@@ -168,8 +168,8 @@ public class ChapterCardController implements Initializable {
         }
     }
 
-    private String getFileType(File file) {
-        String fileName = file.getName().toLowerCase();
+    private String getFileType(String fileName) {
+        fileName = fileName.toLowerCase();
         if (fileName.endsWith(".pdf")) {
             return "PDF Document";
         } else if (fileName.endsWith(".doc") || fileName.endsWith(".docx")) {

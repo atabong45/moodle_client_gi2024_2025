@@ -19,7 +19,6 @@ public class FileHelper {
         String urlStr = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.superToken + "&wsfunction=" + COURSE_CONTENT + "&moodlewsrestformat=json&courseid=" + courseid;
         String urlStr2 = Moodleclient.serverAddress + "webservice/rest/server.php?wstoken=" + Moodleclient.superToken + "&wsfunction=" + GET_ASSIGNMENTS + "&moodlewsrestformat=json&courseids[0]=" + courseid;
 
-
         try {
             String res = RequestHelper.formRequest(urlStr);
             JSONParser parser = new JSONParser();

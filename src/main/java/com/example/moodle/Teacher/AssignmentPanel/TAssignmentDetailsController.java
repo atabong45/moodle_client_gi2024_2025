@@ -13,13 +13,16 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.ResourceBundle;
 
 public class TAssignmentDetailsController implements Initializable {
@@ -33,7 +36,7 @@ public class TAssignmentDetailsController implements Initializable {
     @FXML
     private Label openDate;
     @FXML
-    private Label lblGrade;
+    private Text lblGrade;
     @FXML
     private Label lblStatus;
     @FXML
@@ -48,7 +51,6 @@ public class TAssignmentDetailsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        lblGrade.setStyle("-fx-text-fill: orange;");
     }
 
     public void handleModify() {
@@ -66,6 +68,7 @@ public class TAssignmentDetailsController implements Initializable {
     public void setGrade() {
         GradeHelper gradeHelper = new GradeHelper();
         Grade grade = gradeHelper.getGrade(submission.getAssignmentid(), submission.getAssignmentid(), submission.getStudentid());
+        // System.out.println(grade.getGrade());
         if(grade != null) {
             lblGrade.setText(grade.getGrade() + "");
         }
@@ -93,7 +96,7 @@ public class TAssignmentDetailsController implements Initializable {
 
     public void setAssignDetails(Assignment assign, Submission submission) {
         this.assignName.setText(assign.getAssignmentname());
-        this.openDate.setText(assign.getCreated() + "");
+        this.openDate.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm").format(new Date(assign.getCreated())));
         // this.dueDate.setText(assign.getDuedate() + "");
         this.submission = submission;
     }
