@@ -20,6 +20,7 @@ import com.example.moodle.api.CourseHelper;
 import com.example.moodle.dao.CourseDAO;
 import com.example.moodle.moodleclient.Moodleclient;
 import javafx.animation.KeyFrame;
+import javafx.animation.RotateTransition;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -165,8 +166,6 @@ public class TopDashboardController implements Initializable{
 
         @FXML
         void handleSyncBtn(ActionEvent event) {
-            syncImg.setRotate(180);
-            syncImg.setSmooth(true);
             //pull des fichier des cour au quel le user est inscrit
             getCoursesOfUser();
             getdownloadfileAndStoreDB();
@@ -181,8 +180,15 @@ public class TopDashboardController implements Initializable{
                     moveToUserPrivateFiles(draftId);
                 }
             }
-            // Logic for sync button
-            System.out.println("Sync Clicked");
+            // rotation du bouton
+            RotateTransition btnrot = new RotateTransition(Duration.seconds(2), syncBtn);
+            btnrot.setByAngle(360);
+            btnrot.setCycleCount(1);
+            btnrot.setAutoReverse(false);
+            btnrot.play();
+
+            // defilement de la progressbar
+
         }
 
     public static void readCoursessyncro() {
