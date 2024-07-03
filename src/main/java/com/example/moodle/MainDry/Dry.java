@@ -73,11 +73,6 @@ public class Dry {
         }
     }
 }
-
-
-
-
-
        // FXMLLoader leftLoader = new FXMLLoader(Dry.class.getResource("/com/example/moodle/FXML/leftDashboard_updated.fxml"));
         //AnchorPane leftMenu = leftLoader.load();
         //root.setLeft(leftMenu);

@@ -92,6 +92,7 @@ public class StudentCourseViewController implements Initializable {
     @FXML
     void handleChaptersBtn(ActionEvent event) {
         selectBtn(leftbtnMenu, ChaptersBtn);
+        courseDescription.setVisible(false);
         chaptersTitle.setVisible(true);
         ChaptersVbox.setVisible(true);
         ChaptersVbox.getChildren().clear();
@@ -105,6 +106,8 @@ public class StudentCourseViewController implements Initializable {
     void handleParticipantsBtn(ActionEvent event) {
         ChaptersVbox.setVisible(true);
         selectBtn(leftbtnMenu, ParticipantsBtn);
+        courseDescription.setVisible(false);
+        chaptersTitle.setVisible(false);
         ChaptersVbox.getChildren().clear();
         UsersList.clear();
 

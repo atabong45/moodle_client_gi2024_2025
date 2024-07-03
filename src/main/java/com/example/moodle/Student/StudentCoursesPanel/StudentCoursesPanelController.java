@@ -28,8 +28,8 @@ import static com.example.moodle.moodleclient.Moodleclient.user;
 
 public class StudentCoursesPanelController implements Initializable {
 
-    @FXML
-    private Label labelNewCourse;
+//    @FXML
+//    private Label labelNewCourse;
 
     @FXML
     private Label returnArrow;

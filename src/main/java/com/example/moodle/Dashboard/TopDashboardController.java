@@ -14,8 +14,10 @@ import com.example.moodle.HelloApplication;
 import com.example.moodle.Login.HelloController;
 
 import com.example.moodle.Privatefiles.PrivateFile;
-import com.example.moodle.Teacher.entity.Course;
+import com.example.moodle.Entities.Course;
 import com.example.moodle.Teacher.entity.CoursePull;
+import com.example.moodle.api.CourseHelper;
+import com.example.moodle.dao.CourseDAO;
 import com.example.moodle.moodleclient.Moodleclient;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -60,12 +62,8 @@ import org.json.JSONObject;
 
 import static com.example.moodle.DBConnection.*;
 import static com.example.moodle.HelloApplication.stage;
+import static com.example.moodle.moodleclient.Moodleclient.*;
 import static com.example.moodle.moodleclient.client_moodle.username;
-import static com.example.moodle.moodleclient.Moodleclient.superToken;
-import static com.example.moodle.moodleclient.Moodleclient.user;
-
-
-
 
 public class TopDashboardController implements Initializable{
 
@@ -119,16 +117,11 @@ public class TopDashboardController implements Initializable{
 
     private static ObservableList<Course> courList = FXCollections.observableArrayList();
     static List<PrivateFile> privateFiles = new ArrayList<>();
-    static List<CoursePull> userCourses = new ArrayList<>();
-
-
+    static List<Course> userCourses = new ArrayList<>();
 
     private static final String SERVER_ADDRESS = "http://localhost/";
 
-
     private static final String REQUEST_URL = "http://localhost/login/token.php?username=admin&password=Admin@123&service=moodle";
-
-
 
     @Override
         public void initialize(URL url, ResourceBundle rb) {
@@ -181,8 +174,8 @@ public class TopDashboardController implements Initializable{
         //action de syncronisatiion du cours
             //SyncroniserCour();
             //action de syncronisation des fichier privés
-            List<PrivateFile> privatesyncrofiles=readPrivateFilessyncro();
-            for(PrivateFile prifiles:privatesyncrofiles){
+            List<PrivateFile> privatesyncrofiles = readPrivateFilessyncro();
+            for(PrivateFile prifiles: privatesyncrofiles){
                 String draftId = uploadFileToDraftArea(prifiles.getFilePath());
                 if (draftId != null) {
                     moveToUserPrivateFiles(draftId);
@@ -193,30 +186,33 @@ public class TopDashboardController implements Initializable{
         }
 
     public static void readCoursessyncro() {
-
-        String query = "SELECT id,courseName,courseAbr,courseDescription,nbChapters,nbAssignments FROM Course";
-        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(query)) {
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String courseName = resultSet.getString("courseName");
-                String courseAbr = resultSet.getString("courseAbr");
-                String courseDescription = resultSet.getString("courseDescription");
-                int nbChapters = resultSet.getInt("nbChapters");
-                int nbAssignments = resultSet.getInt("nbAssignments");
-
-                System.out.println("ID: " + id + ", Course Name: " + courseName + ", Course Abbreviation: " + courseAbr +
-                        ", Description: " + courseDescription + ", Chapters: " + nbChapters + ", Assignments: " + nbAssignments);
-                courList.add(new Course( id, courseName, courseAbr,courseDescription,nbChapters,nbAssignments));
+        ArrayList<Course> courses = CourseDAO.getEnrolledCourses(user.getId());
+        if(courses.size() != 0) {
+            for(Course course: courses) {
+                courList.add(course);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
+//        String query = "SELECT id,courseName,courseAbr,courseDescription,nbChapters,nbAssignments FROM Course";
+//        try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
+//             Statement statement = connection.createStatement();
+//             ResultSet resultSet = statement.executeQuery(query)) {
+//            while (resultSet.next()) {
+//                int id = resultSet.getInt("id");
+//                String courseName = resultSet.getString("courseName");
+//                String courseAbr = resultSet.getString("courseAbr");
+//                String courseDescription = resultSet.getString("courseDescription");
+//                int nbChapters = resultSet.getInt("nbChapters");
+//                int nbAssignments = resultSet.getInt("nbAssignments");
+//
+//                System.out.println("ID: " + id + ", Course Name: " + courseName + ", Course Abbreviation: " + courseAbr +
+//                        ", Description: " + courseDescription + ", Chapters: " + nbChapters + ", Assignments: " + nbAssignments);
+//                courList.add(new Course( id, courseName, courseAbr,courseDescription,nbChapters,nbAssignments));
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
     }
     public static List<PrivateFile> readPrivateFilessyncro() {
-
-
         String query = "SELECT * FROM private_files";
         try (Connection connection = DriverManager.getConnection(JDBC_URL,JDBC_USERNAME, JDBC_PASSWORD);
              Statement statement = connection.createStatement();
@@ -236,8 +232,10 @@ public class TopDashboardController implements Initializable{
     }
 
     public void SyncroniserCour() {
+        CourseHelper courseHelper = new CourseHelper();
+        ArrayList<Course> coursesFromServer = courseHelper.getEnrolledCourses(user.getId());
         readCoursessyncro();
-        List<PrivateFile> privatesyncrofiles=readPrivateFilessyncro();
+        List<PrivateFile> privatesyncrofiles = readPrivateFilessyncro();
         for(PrivateFile prifiles:privatesyncrofiles){
             String draftId = uploadFileToDraftArea(prifiles.getFilePath());
             if (draftId != null) {
@@ -246,11 +244,21 @@ public class TopDashboardController implements Initializable{
         }
 
         String moodleUrl = "http://localhost/webservice/rest/server.php";
-        String token = "2a8037fc2be456239aba388221cfc1f7";
+        String token = Moodleclient.token;
         String categoryid = "1";
 
+        if(coursesFromServer.size() != 0) {
+            for (Course courseFrom: coursesFromServer) {
+                for (Course courseToSend: courList) {
+                    if(courseFrom.getCourseid() == courseToSend.getCourseid()) {
+                        courList.remove(courseToSend);
+                    }
+                }
+            }
+        }
+
         for (Course cour : courList) {
-            System.out.println("ID: " + cour.getId() + ", Course Name: " + cour.getCourseAbr() + ", Course Abbreviation: " + cour.getCourseDescription());
+            System.out.println("ID: " + cour.getCourseid() + ", Course Name: " + cour.getFullname() + ", Course Abbreviation: " + cour.getShortname());
             try {
                     URL url = new URL(moodleUrl);
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -259,10 +267,10 @@ public class TopDashboardController implements Initializable{
                     conn.setDoOutput(true);
 
                     String params = "moodlewsrestformat=json&wsfunction=core_course_create_courses&wstoken=" + token +
-                            "&courses[0][fullname]=" + cour.getCourseName() +
-                            "&courses[0][shortname]=" + cour.getCourseAbr() +
+                            "&courses[0][fullname]=" + cour.getFullname() +
+                            "&courses[0][shortname]=" + cour.getShortname() +
                             "&courses[0][categoryid]=" + categoryid +
-                            "&courses[0][summary]=" + cour.getCourseDescription();
+                            "&courses[0][summary]=" + cour.getSummary();
 
                     try (OutputStream os = conn.getOutputStream()) {
                         byte[] input = params.getBytes(StandardCharsets.UTF_8);
@@ -274,9 +282,9 @@ public class TopDashboardController implements Initializable{
 
                     if (responseCode == HttpURLConnection.HTTP_OK) {
 
-                        System.out.println("Course synchronized: " + cour.getCourseName());
+                        System.out.println("Course synchronized: " + cour.getFullname());
                     } else {
-                        System.out.println("Failed to synchronize course: " + cour.getCourseName());
+                        System.out.println("Failed to synchronize course: " + cour.getFullname());
                     }
 
                     conn.disconnect();
@@ -331,7 +339,7 @@ public class TopDashboardController implements Initializable{
         }
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + superToken);
+            HttpPost uploadFile = new HttpPost(SERVER_ADDRESS + "webservice/upload.php?token=" + token);
             MultipartEntityBuilder builder = MultipartEntityBuilder.create();
             builder.addBinaryBody("file_1", file, ContentType.APPLICATION_OCTET_STREAM, file.getName());
             HttpEntity multipart = builder.build();
@@ -366,7 +374,7 @@ public class TopDashboardController implements Initializable{
             List<NameValuePair> urlParameters = new ArrayList<>();
             urlParameters.add(new BasicNameValuePair("draftid", draftId));
             urlParameters.add(new BasicNameValuePair("wsfunction", "core_user_add_user_private_files"));
-            urlParameters.add(new BasicNameValuePair("wstoken", superToken));
+            urlParameters.add(new BasicNameValuePair("wstoken", token));
 
             post.setEntity(new UrlEncodedFormEntity(urlParameters));
             HttpResponse response = httpClient.execute(post);
@@ -379,21 +387,33 @@ public class TopDashboardController implements Initializable{
         }
     }
 
-
-
     //PULL DES COURS
 
-
     public void getCoursesOfUser() {
+        CourseHelper courseHelper = new CourseHelper();
         try {
             int userId = getUserId(user.getUsername());
             if (userId != -1) {
-                userCourses = getUserEnrolledCourses(userId);
-
-                // Print user enrolled courses
-                for (CoursePull course : userCourses) {
-                    System.out.println("Course ID: " + course.id + ", Course Name: " + course.getFullname());
+                ArrayList<Course> coursesFromDB = CourseDAO.getEnrolledCourses(userId);
+                userCourses = courseHelper.getEnrolledCourses(userId);
+                if(userCourses.size() != 0) {
+                    for (Course course: userCourses) {
+                        boolean found = false;
+                        for (Course courseFromDB: coursesFromDB) {
+                            if(course.getCourseid() == courseFromDB.getCourseid()) {
+                                found = true;
+                                continue;
+                            }
+                        }
+                        if(!found) CourseDAO.insertCourse(course);
+                    }
                 }
+//                userCourses = getUserEnrolledCourses(userId);
+//
+//                // Print user enrolled courses
+//                for (CoursePull course : userCourses) {
+//                    System.out.println("Course ID: " + course.id + ", Course Name: " + course.getFullname());
+//                }
             } else {
                 System.out.println("User not found.");
             }
@@ -402,14 +422,13 @@ public class TopDashboardController implements Initializable{
         }
     }
 
-
     public void getdownloadfileAndStoreDB() {
 
         try {
 
             // For each course, retrieve and process course contents
-            for (CoursePull course : userCourses) {
-                JSONArray courseContents = getCourseContents(course.id);
+            for (Course course : userCourses) {
+                JSONArray courseContents = getCourseContents(course.getCourseid());
 
                 for (int i = 0; i < courseContents.length(); i++) {
                     JSONObject topic = courseContents.getJSONObject(i);
@@ -431,7 +450,7 @@ public class TopDashboardController implements Initializable{
                                 String filePath = downloadFile(fileUrl, fileName);
 
                                 // Store the file path in the database
-                                storeFilePathInDatabase(course.id, topicName, fileName, filePath);
+                                storeFilePathInDatabase((int) course.getCourseid(), topicName, fileName, filePath);
 
                                 System.out.println("    File: " + fileName + " downloaded to " + filePath);
                             }
@@ -445,9 +464,6 @@ public class TopDashboardController implements Initializable{
             e.printStackTrace();
         }
     }
-
-
-
 
     private static int getUserId(String username) throws Exception {
         String urlString = "http://localhost/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_user_get_users&wstoken=" + superToken + "&criteria[0][key]=username&criteria[0][value]=" + user.getUsername();
@@ -521,7 +537,7 @@ public class TopDashboardController implements Initializable{
     }
 
 
-    private static JSONArray getCourseContents(int courseId) throws Exception {
+    private static JSONArray getCourseContents(long courseId) throws Exception {
         String urlString = "http://localhost/webservice/rest/server.php?moodlewsrestformat=json&wsfunction=core_course_get_contents&wstoken=" + superToken + "&courseid=" + courseId;
         return getJsonArrayFromUrl(urlString);
     }
@@ -556,11 +572,6 @@ public class TopDashboardController implements Initializable{
             preparedStatement.executeUpdate();
         }
     }
-
-
-
-
-
 
     private static boolean saveFileToCourseModule(String draftItemId, int contextId, int moduleId, String fileName, String filePath) {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {

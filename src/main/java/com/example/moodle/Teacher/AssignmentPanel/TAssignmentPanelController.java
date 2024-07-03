@@ -91,22 +91,25 @@ public class TAssignmentPanelController implements Initializable {
         ArrayList<Submission> submissions = submissionHelper.getAllSubmissions(assignmentid);
         gridpane.getChildren().clear();
         for(int i = 0; i < submissions.size(); i++) {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/TeacherAssignmentCard.fxml"));
+            if(submissions.get(i).getStudentid() != Moodleclient.user.getId()) {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/moodle/FXML/TeacherAssignmentCard.fxml"));
 
-                AnchorPane assignCard = loader.load();
+                    AnchorPane assignCard = loader.load();
 
-                TAssignmentCardController controller = loader.getController();
-                controller.setAssignDetails(submissions.get(i));
+                    TAssignmentCardController controller = loader.getController();
+                    controller.setAssignDetails(submissions.get(i));
 
-                gridpane.add(assignCard, 0, i+1);
-                GridPane.setMargin(assignCard, new javafx.geometry.Insets(15, 20, 5, 10));
+                    gridpane.add(assignCard, 0, i+1);
+                    GridPane.setMargin(assignCard, new javafx.geometry.Insets(15, 20, 5, 10));
 
-            } catch (IOException e) {
-                // Handle the exception (e.g., display error message)
-                System.err.println("Error loading assignments: " + e.getMessage());
+                } catch (IOException e) {
+                    // Handle the exception (e.g., display error message)
+                    System.err.println("Error loading assignments: " + e.getMessage());
 
+                }
             }
+
         }
     }
 }
